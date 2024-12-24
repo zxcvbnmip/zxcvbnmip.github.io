@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>archlinux安装及配置 | Tokisaka no heya</title><meta name="author" content="Tokisaka"><meta name="copyright" content="Tokisaka"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="事前准备 一个U盘   archlinux [ISO镜像](https:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;archlinux&#x2F;iso&#x2F;2024.12.01&#x2F;)    正式开始 进入bios,选择从U盘启动   禁用reflector  1sudo systemctl stop reflector.service 检查1sudo systemctl status reflector.serv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="archlinux安装及配置">
+<meta property="og:url" content="http://example.com/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Tokisaka no heya">
+<meta property="og:description" content="事前准备 一个U盘   archlinux [ISO镜像](https:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;archlinux&#x2F;iso&#x2F;2024.12.01&#x2F;)    正式开始 进入bios,选择从U盘启动   禁用reflector  1sudo systemctl stop reflector.service 检查1sudo systemctl status reflector.serv">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_5_pc.png">
+<meta property="article:published_time" content="2024-12-24T10:04:43.000Z">
+<meta property="article:modified_time" content="2024-12-24T12:28:17.890Z">
+<meta property="article:author" content="Tokisaka">
+<meta property="article:tag" content="教程">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_5_pc.png"><link rel="shortcut icon" href="https://image.2254134.xyz/i/2024/07/26/syslae.png"><link rel="canonical" href="http://example.com/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":200},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Tokisaka","link":"链接: ","source":"来源: Tokisaka no heya","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'archlinux安装及配置',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-24 12:28:17'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://image.2254134.xyz/i/2024/07/26/sdort8.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://gakuen.idolmaster-official.jp/assets/img/pre/kv_5_pc.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Tokisaka no heya"><img class="site-icon" src="https://image.2254134.xyz/i/2024/07/26/syslae.png"/><span class="site-name">Tokisaka no heya</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">archlinux安装及配置</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-24T10:04:43.000Z" title="发表于 2024-12-24 10:04:43">2024-12-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-24T12:28:17.890Z" title="更新于 2024-12-24 12:28:17">2024-12-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="archlinux安装及配置"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h4 id="事前准备"><a href="#事前准备" class="headerlink" title="事前准备"></a>事前准备</h4><ol>
+<li><pre><code>一个U盘
+</code></pre>
+</li>
+<li><pre><code>archlinux [ISO镜像](https://mirrors.aliyun.com/archlinux/iso/2024.12.01/)
+</code></pre>
+</li>
+</ol>
+<h3 id="正式开始"><a href="#正式开始" class="headerlink" title="正式开始"></a>正式开始</h3><ol>
+<li><pre><code>进入bios,选择从U盘启动
+</code></pre>
+</li>
+<li><pre><code>禁用reflector
+</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl stop reflector.service</span><br></pre></td></tr></table></figure></li>
+<li>检查<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl status reflector.service</span><br></pre></td></tr></table></figure></li>
+<li>更改国内源<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/pacman.d/mirrorlist</span><br></pre></td></tr></table></figure>
+改为以下内容<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Server = https://mirrors.ustc.edu.cn/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 中国科学技术大学开源镜像站</span></span><br><span class="line">Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 清华大学开源软件镜像站</span></span><br><span class="line">Server = https://repo.huaweicloud.com/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 华为开源镜像站</span></span><br><span class="line">Server = http://mirror.lzu.edu.cn/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 兰州大学开源镜像站</span></span><br></pre></td></tr></table></figure></li>
+<li>archinstall脚本安装<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">archinstall</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>mirror region选择china的话，连接163镜像可能会很慢，还请使用变量挂代理。</p>
+<blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;<span class="built_in">export</span> http_proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure>
+<p>locale设置zh_CN.UTF-8的话，桌面环境可能会出现字体问题，需要额外安装包<code>noto-fonts-cjk</code> <code>wqy-bitmapfont</code> <code>wqy-zenhei</code></p>
+</blockquote>
+</blockquote>
+</li>
+</ol>
+<h3 id="安装完成开始配置"><a href="#安装完成开始配置" class="headerlink" title="安装完成开始配置"></a>安装完成开始配置</h3><ol start="6">
+<li><pre><code>等待更新完成，更新仓库
+</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -Syy</span><br></pre></td></tr></table></figure></li>
+<li><pre><code>安装必备软件
+</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S git p7zip docker docker-compose timeshift fcitx5 fcitx5-im fcitx5-chinese-addons fcitx5-anthy</span><br></pre></td></tr></table></figure></li>
+<li><h5 id="设置代理"><a href="#设置代理" class="headerlink" title="设置代理"></a>设置代理</h5></li>
+</ol>
+<p>把mihomo配置文件们放到<code>/etc/mihomo</code>下,直接设置777权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chmod</span> 777 -R /etc/mihomo</span><br></pre></td></tr></table></figure>
+<p>把mihomo二进制可执行文件<code>mihomo</code>放到<code>/usr/local/bin/</code>并给予可执行权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chmod</span> +x /usr/local/bin/mihomo</span><br></pre></td></tr></table></figure>
+<p>创建运行服务，先进入<code>/etc/systemd/system/</code>,新建<code>mihomo.service</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/systemd/system/</span><br><span class="line"><span class="built_in">sudo</span> vim mihomo.service</span><br></pre></td></tr></table></figure>
+<p>内容为下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=mihomo Daemon, Another Clash Kernel.</span><br><span class="line">After=network.target NetworkManager.service systemd-networkd.service iwd.service</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">LimitNPROC=500</span><br><span class="line">LimitNOFILE=1000000</span><br><span class="line">CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE	CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE</span><br><span class="line">AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE</span><br><span class="line">Restart=always</span><br><span class="line">ExecStartPre=/usr/bin/sleep 1s</span><br><span class="line">ExecStart=/usr/local/bin/mihomo -d /etc/mihomo</span><br><span class="line">ExecReload=/bin/kill -HUP <span class="variable">$MAINPID</span></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<p>重载systemd：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl daemon-reload</span><br></pre></td></tr></table></figure>
+<p>启用并启动mihomo:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> mihomo</span><br><span class="line"><span class="built_in">sudo</span> systemctl start mihomo</span><br></pre></td></tr></table></figure>
+<p>查看运行状态:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl status mihomo</span><br></pre></td></tr></table></figure>
+<p>查看日志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -u mihomo -o <span class="built_in">cat</span> -e</span><br></pre></td></tr></table></figure>
+<ol start="9">
+<li><h5 id="配置paru"><a href="#配置paru" class="headerlink" title="配置paru"></a>配置paru</h5></li>
+</ol>
+<p>安装必要组件并克隆paru源代码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S --needed base-devel</span><br><span class="line">git <span class="built_in">clone</span> https://aur.archlinux.org/paru.git</span><br></pre></td></tr></table></figure>
+<p>编译并安装paru</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> paru</span><br><span class="line">makepkg -si</span><br></pre></td></tr></table></figure>
+<p>启用paru颜色,取消<code>#Color</code>的注释</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/pacman.conf</span><br></pre></td></tr></table></figure>
+<p>paru基本命令：</p>
+<ul>
+<li><code>paru &lt;用户输入&gt;</code> : 搜索并安装“用户输入”</li>
+<li><code>paru -</code> : <code>paru -Syu</code>的别名</li>
+<li><code>paru -Sua</code> : 仅升级 AUR 包。</li>
+<li><code>paru -Qua</code> : 打印可用的 AUR 更新</li>
+<li><code>paru -Gc &lt;用户输入&gt;</code> ： 显示“用户输入”的 AUR 评论</li>
+</ul>
+<ol start="10">
+<li><h5 id="配置VNC"><a href="#配置VNC" class="headerlink" title="配置VNC"></a>配置VNC</h5></li>
+</ol>
+<p>下载vncserver</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S tigervnc</span><br></pre></td></tr></table></figure>
+<p>设置用户和密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vncpasswd</span><br></pre></td></tr></table></figure>
+<p>编辑<code>/etc/tigervnc/vncserver.users</code>来定义用户映射。<br>该文件中定义的每个用户都会拥有对应的端口来运行会话。<br>默认情况下，:1 是 TCP 端口 5901 (5900+1如果需要运行一个并行的服务端，第二个实例可以运行在下一个最大的、未被占用的端口，即 5902 (5900+2)。<br>创建<code>~/.vnc/config</code>,内容为下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">session=xfce</span><br><span class="line">geometry=1920x1080</span><br><span class="line">localhost</span><br><span class="line">alwaysshared</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>session=foo</code> （将foo替换为你想要运行的桌面环境）。<br>你可以通过查看 &#x2F;usr&#x2F;share&#x2F;xsessions&#x2F; 里的 .desktop 文件来知道有哪些桌面环境在当前系统上可以使用。<br>    创建vncserver服务，复制示例文件</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> /usr/lib/systemd/system/vncserver.service /etc/systemd/system/vncserver@:1.service</span><br></pre></td></tr></table></figure>
+<p>创建<code>~/.vnc/.xtartup</code>,内容为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xrdb ~/.Xresource</span><br><span class="line">startxfce4</span><br></pre></td></tr></table></figure>
+<p>启用vncserver</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> vncserver@:1.service</span><br><span class="line"><span class="built_in">sudo</span> systemctl start vncserver@:1.service</span><br></pre></td></tr></table></figure>
+<ol start="11">
+<li><h5 id="配置x0vncserver"><a href="#配置x0vncserver" class="headerlink" title="配置x0vncserver"></a>配置x0vncserver</h5></li>
+</ol>
+<p>直接启动x0vncserver</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x0vncserver -rfbauth ~/.vnc/passwd</span><br></pre></td></tr></table></figure>
+<p>使用systemd启停x0vncserver<br>创建<code>/etc/systemd/system/x0vncserver.service</code>，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/systemd/system/</span><br><span class="line"><span class="built_in">sudo</span> vim x0vncserver.service</span><br></pre></td></tr></table></figure>
+<p>内容如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Remote desktop service (VNC) <span class="keyword">for</span> :0 display</span><br><span class="line">Requires=display-manager.service</span><br><span class="line">After=network-online.target</span><br><span class="line">After=display-manager.service</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">Environment=HOME=/root</span><br><span class="line">Environment=XAUTHORITY=/var/run/lightdm/root/:0</span><br><span class="line">ExecStart=x0vncserver -display :0 -rfbauth <span class="variable">$XDG_CONFIG_HOME</span>/tigervnc/passwd</span><br><span class="line">Restart=on-failure</span><br><span class="line">RestartSec=500ms</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<p>启用x0vncserver</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> x0vncserver</span><br><span class="line"><span class="built_in">sudo</span> systemctl start x0vncserver</span><br></pre></td></tr></table></figure>
+<ol start="12">
+<li><h5 id="配置输入法"><a href="#配置输入法" class="headerlink" title="配置输入法"></a>配置输入法</h5></li>
+</ol>
+<p>安装相关软件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-im</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-chinese-addons</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-anthy</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-pinyin-moegirl</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-material-color</span><br></pre></td></tr></table></figure>
+<p>设置环境变量,<code>~/.config/environment.d/im.conf</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.config/environment.d/</span><br><span class="line">vim im.conf</span><br></pre></td></tr></table></figure>
+<p>内容为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># fix fcitx problem</span></span><br><span class="line">GTK_IM_MODULE=fcitx</span><br><span class="line">QT_IM_MODULE=fcitx</span><br><span class="line">XMODIFIERS=@im=fcitx</span><br><span class="line">SDL_IM_MODULE=fcitx</span><br><span class="line">GLFW_IM_MODULE=ibus</span><br></pre></td></tr></table></figure></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Tokisaka</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/">http://example.com/2024/12/24/archlinux安装及配置/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Tokisaka no heya</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%99%E7%A8%8B/">教程</a><a class="post-meta__tags" href="/tags/linux/">linux</a></div><div class="post_share"><div class="social-share" data-image="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_5_pc.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2024/09/05/%E5%88%A0%E9%99%A4%E5%9C%A8C%E7%9B%98%E4%BB%A5%E5%A4%96%E7%9A%84%E7%9B%98%E7%AC%A6%E5%88%9B%E5%BB%BA%E7%9A%84%E6%81%B6%E5%BF%83%E7%9A%84porgramfiles%E6%96%87%E4%BB%B6%E5%A4%B9/" title="删除在C盘以外的盘符创建的恶心的porgramfiles文件夹"><img class="cover" src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_6_pc.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">删除在C盘以外的盘符创建的恶心的porgramfiles文件夹</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/07/26/%E4%BD%BF%E7%94%A8ssh%E5%AF%86%E9%92%A5%E5%AE%8C%E6%88%90github-commit%E7%9A%84%E8%AE%A4%E8%AF%81/" title="使用ssh密钥完成github commit的认证"><img class="cover" src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_7_pc.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-07-26</div><div class="title">使用ssh密钥完成github commit的认证</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://image.2254134.xyz/i/2024/07/26/sdort8.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Tokisaka</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/zxcvbnmip" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:wuzhishiwode@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E5%89%8D%E5%87%86%E5%A4%87"><span class="toc-number">1.</span> <span class="toc-text">事前准备</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A3%E5%BC%8F%E5%BC%80%E5%A7%8B"><span class="toc-number"></span> <span class="toc-text">正式开始</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E5%AE%8C%E6%88%90%E5%BC%80%E5%A7%8B%E9%85%8D%E7%BD%AE"><span class="toc-number"></span> <span class="toc-text">安装完成开始配置</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86"><span class="toc-number">0.1.</span> <span class="toc-text">设置代理</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEparu"><span class="toc-number">0.2.</span> <span class="toc-text">配置paru</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEVNC"><span class="toc-number">0.3.</span> <span class="toc-text">配置VNC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEx0vncserver"><span class="toc-number">0.4.</span> <span class="toc-text">配置x0vncserver</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E8%BE%93%E5%85%A5%E6%B3%95"><span class="toc-number">0.5.</span> <span class="toc-text">配置输入法</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/" title="archlinux安装及配置"><img src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_5_pc.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="archlinux安装及配置"/></a><div class="content"><a class="title" href="/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/" title="archlinux安装及配置">archlinux安装及配置</a><time datetime="2024-12-24T10:04:43.000Z" title="发表于 2024-12-24 10:04:43">2024-12-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/09/05/%E5%88%A0%E9%99%A4%E5%9C%A8C%E7%9B%98%E4%BB%A5%E5%A4%96%E7%9A%84%E7%9B%98%E7%AC%A6%E5%88%9B%E5%BB%BA%E7%9A%84%E6%81%B6%E5%BF%83%E7%9A%84porgramfiles%E6%96%87%E4%BB%B6%E5%A4%B9/" title="删除在C盘以外的盘符创建的恶心的porgramfiles文件夹"><img src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_6_pc.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="删除在C盘以外的盘符创建的恶心的porgramfiles文件夹"/></a><div class="content"><a class="title" href="/2024/09/05/%E5%88%A0%E9%99%A4%E5%9C%A8C%E7%9B%98%E4%BB%A5%E5%A4%96%E7%9A%84%E7%9B%98%E7%AC%A6%E5%88%9B%E5%BB%BA%E7%9A%84%E6%81%B6%E5%BF%83%E7%9A%84porgramfiles%E6%96%87%E4%BB%B6%E5%A4%B9/" title="删除在C盘以外的盘符创建的恶心的porgramfiles文件夹">删除在C盘以外的盘符创建的恶心的porgramfiles文件夹</a><time datetime="2024-09-05T01:56:16.000Z" title="发表于 2024-09-05 01:56:16">2024-09-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/08/13/scoop%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" title="scoop安装及使用"><img src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_5_pc.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="scoop安装及使用"/></a><div class="content"><a class="title" href="/2024/08/13/scoop%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" title="scoop安装及使用">scoop安装及使用</a><time datetime="2024-08-13T03:14:15.000Z" title="发表于 2024-08-13 03:14:15">2024-08-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/07/26/%E4%BD%BF%E7%94%A8ssh%E5%AF%86%E9%92%A5%E5%AE%8C%E6%88%90github-commit%E7%9A%84%E8%AE%A4%E8%AF%81/" title="使用ssh密钥完成github commit的认证"><img src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_7_pc.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用ssh密钥完成github commit的认证"/></a><div class="content"><a class="title" href="/2024/07/26/%E4%BD%BF%E7%94%A8ssh%E5%AF%86%E9%92%A5%E5%AE%8C%E6%88%90github-commit%E7%9A%84%E8%AE%A4%E8%AF%81/" title="使用ssh密钥完成github commit的认证">使用ssh密钥完成github commit的认证</a><time datetime="2024-07-26T06:15:59.000Z" title="发表于 2024-07-26 06:15:59">2024-07-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/07/21/hello-world/" title="Hello World"><img src="https://gakuen.idolmaster-official.jp/assets/img/pre/kv_4_pc.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2024/07/21/hello-world/" title="Hello World">Hello World</a><time datetime="2024-07-21T07:29:50.234Z" title="发表于 2024-07-21 07:29:50">2024-07-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Tokisaka</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
