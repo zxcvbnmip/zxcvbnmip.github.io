@@ -1,106 +1,1239 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
+<search>
+  <entry>
+    <title>JCGQ30 pro 刷入immortalWRT</title>
+    <url>/2026/01/10/JCGQ30-pro-%E5%88%B7%E5%85%A5immortalWRT/</url>
+    <content><![CDATA[前言很久之前就想要一个openwrt路由器，但是没闲钱专门买个软路由，所以只能找个便宜简单的可以刷机的路由器来折腾。openwrt确实比那些企业给的路由器功能多。 Click但这其实是一个老版本immortalwrt升级新版本immortalwrt的itb格式的记录
+事前准备
+原厂分区过渡固件
+immortalwrt factory固件
+扩容uboot
+immortalwrt sysupgrade固件
+
+文件来源：
+
+原厂分区过渡固件
+immortalwrt factory固件
+扩容uboot
+immortalwrt sysupgrade固件
+
+
+
+刷入原厂分区过渡包路由器的lan口与电脑相连，浏览器打开‘192.168.1.1’，按照路由器底部的用户名密码登陆后进入‘高级设置’中的‘升级固件’，选择上传“237 大佬的原厂分区过渡固件&#x2F;底包 immortalwrt_mediatek_mt7981_mt7981_spim_nand_rfb_squashfs_sysupgrade.bin，取消勾选保留配置，点击升级。此包开机后直接自动刷写 U-Boot。无须手动刷入。
+刷入原厂分区factory固件完成上一步后静待几分钟，随后按住路由器背后的reset，拔掉并再次插入电源，知道指示灯变成蓝色松开手。由于没有dhcp，在连接的网卡中进行如下设置。
+
+
+
+IP
+192.168.1.2
+
+
+
+网关
+192.168.1.1
+
+
+网关掩码
+255.255.255.0
+
+
+DNS 服务器
+192.168.1.1
+
+
+设置完成后用浏览器打开192.168.1.1，点击 upload 上传immortalwrt-23.05.1-mediatek-filogic-jcg_q30-ubootmod-squashfs-factory.bin，上传完点击update，更新完成后会自动重启路由器，此时可以取消静态ip的设置
+刷入大分区uboot路由器启动完成后，浏览器打开192.168.1.1，直接登陆，默认无密码，可以先设置一个密码。新建ssh连接，地址为192.168.1.1,用户名为root,密码是刚刚设置的路由器密码。把uboot上传至/tmp目录，随后执行如下命令
+mtd write /tmp/mt7981-jcg_q30-fip-expand.bin FIP
+没有报错则刷完了。
+刷入immortalwrt sysupgrade固件再次重置路由器，进入192.168.1.1，这回选择immortalwrt sysupgrade固件，update刷入，等待片刻会自动重启。此时192.168.1.1则变成immortalwrt的后台。
+]]></content>
+      <tags>
+        <tag>openwrt</tag>
+        <tag>刷机</tag>
+        <tag>路由器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Archlinux安装及初始化记录</title>
+    <url>/2025/11/13/Archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E5%88%9D%E5%A7%8B%E5%8C%96%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[前言archlinux是一个让人又爱又恨的
+linux发行版，安装他往往被当成一个linux新手的试炼，但是现在 `archinstall` 的存在使得这个情况得以缓解。
+
+事前准备
+ISO镜像iso镜像可以从archlinux官网下载，以下可以快速下载。
+
+快速下载不保证时效性。
+
+torrentdirect
+Magnet link for 2025.11.01
+Torrent for 2025.11.01
+HTTP Direct Downloads
+
+U盘（主机，可选）
+VMware or VirtualBox（虚拟机软件，可选）
+
+安装镜像实体机安装镜像这里一后补
+虚拟机安装（VMware）
+新建虚拟机，创建典型配置，在安装程序光盘映像文件中选择Archlinux的ISO镜像，客户端操作系统选择linux，版本选择其他Linux 6.x内核64位，自定义虚拟机名称，位置，根据自身使用情况，配置磁盘，内存大小，一路完成。
+
+磁盘最好&gt;20G,内存最好&gt;4G,不然最后还得扩展。
+
+
+
+启动虚拟机，自动进入Archlinux的liveiso系统，运行 archinstall 执行安装脚本。
+
+如果发现键盘输入和终端展示不对应，则前往虚拟机 &gt; 设置 &gt; 显示 &gt; 3D图形，关闭3D加速。
+据说在此虚拟机的vmx文件中添加keyboard.vusb.enable =&quot;TRUE&quot;,则可以在打开3D加速时解决这个问题，但是我尝试后没用。
+
+
+
+
+选择需要的配置，选择软件源地区为China，可以按意愿设置locale，桌面环境xfce，必要软件git wget curl vim，网络管理器network-manager，root用户密码，普通用户及其密码等。随后install进入安装，静待片刻。
+
+locale选择zh_CN.UTF8,在开机后可能会出现方块，这是由于字体缺失导致的，可以在安装时选择额外安装的软件noto-fonts-cjk wqy-zenhei wqy-bitmapfont。
+
+
+系统配置开机第一步，系统更新安装完成后，greeter界面输入用户密码进入桌面，打开终端并键入，
+sudo pacman -Syyu
+输入用户密码完成更新。
+配置shell配置fishshell本体
+我喜欢使用fishshell，使用pacman安装他的前置套件，字体等。
+
+sudo pacman -S wget git curl vim nvm# 安装必要工具sudo pacman -S fish
+切换默认shell
+chsh -s $(which fish)fish #进入fishshell
+
+重启会发现默认shell也变了。
+配置fishshell插件
+安装fisher插件管理器，
+
+sudo pacman -S fisher
+
+也可以通过 git 仓库安装
+curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source &amp;&amp; fisher install jorgebucaran/fisher
+查看已安装插件
+fisher list
+
+
+安装必要nerd-font字体
+
+sudo pacman -S ttf-jetbrains-mono-nerd ttf-melso-nerd ttf-ubuntu-nerd# 安装nerd-font字体
+
+
+安装tide主题
+
+fisher install IlanCosman/tide@v6
+一般会自动configure，没有自动进行的话，执行
+tide configure
+
+fish更新到某个版本后，会出现”prompt箭头反向”的问题，这是因为tide对fish模式的误判，解决这个问题可以通过写入如下函数
+function fish_user_key_bindings    fish_hybrid_key_bindings    set -g fish_bind_mode insertend; funcsave fish_user_key_bindings
+
+如果发现字体有问题，则在使用的终端中选择你所安装的nerd-font字体。
+
+
+安装插件的前置套件
+sudo pacman -S bat fd git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf~/.fzf/install
+
+安装插件
+
+fisher install jethrokuan/zfisher install andreiborisov/spongefisher install jorgebucaran/autopair.fishfisher install PatrickF1/fzf.fishfisher install jorgebucaran/nvm.fish               #在 fish shell 中，你不能直接使用 source 命令去加载为 bash 编写的 .sh 脚本，因为语法不兼容。这是目前最流行的方法，它不需要你手动加载任何 .sh 脚本，且支持自动切换 Node 版本。
+
+
+zspongefzfautopair插件 Z 類似於 autojump 的插件，比cd更快速地直接跳到想去的資料夾。Sponge 讓指令歷史紀錄更乾淨，不會去紀錄失敗或是打錯的指令到歷史清單中。搜文件 ctrl+alt+f搜索历史指令 ctrl+r找PID ctrl+alt+pautopair.fish自动帮你补上 ()	 {} [] &#39;&#39; &quot;&quot;
+
+鸣谢:  kwchang0831
+
+
+
+安装输入法我们使用fcitx5输入。键入以下内容安装：
+sudo pacman -S fcitx5-im # 输入法基础包组sudo pacman -S fcitx5-chinese-addons # 官方中文输入引擎sudo pacman -S fcitx5-mozc # 日文输入引擎sudo pacman -S fcitx5-material-color # 输入法主题
+
+此外，我们还需要设置环境变量。通过 vim 创建并编辑文件 ~/.config/environment.d/im.conf
+vim ~/.config/environment.d/im.conf
+在文件内加入以下内容并保存
+# fix fcitx problemGTK_IM_MODULE=fcitxQT_IM_MODULE=fcitxXMODIFIERS=@im=fcitxSDL_IM_MODULE=fcitxGLFW_IM_MODULE=ibus
+
+配置其他基本软件sudo pacman -S docker docker-compose htop timeshift p7zip cmake curl wget git vim neovim lazygit rclone bottles
+
+安装paru我们需要从 git 仓库构建 paru：
+sudo pacman -S --needed base-develgit clone https://aur.archlinux.org/paru.gitcd parumakepkg -si
+构建的过程可能需要一段时间
+从 paru 安装一些软件paru -S mihomo google-chrome vscode
+
+配置smb共享文件夹首先安装samba，随后创建用于共享的文件夹 ~/share，
+sudo pacman -S sambamkdir -p ~/share
+
+创建并编辑smb配置文件 /etc/samba/smb.conf，
+cd /etc/samba/sudo curl -L -o smb.conf.deafult &#x27;https://git.samba.org/samba.git/?p=samba.git;a=blob_plain;f=examples/smb.conf.default;hb=HEAD&#x27;sudo vim /etc/samba/smb.conf
+在最后添加，
+[ShareName]    # &#x27;ShareName&#x27; 是共享在网络中显示的名称    comment = Linux Shared Folder    path = /srv/smb_share       ; 共享文件夹的绝对路径    browseable = yes            ; 允许客户端在网络上看到这个共享    writable = yes              ; 允许客户端写入文件    guest ok = no               ; 不允许匿名访问    valid users = your_user     ; 允许访问的 Samba 用户列表 (用逗号分隔多个用户)    create mask = 0664          ; 客户端创建文件时的权限掩码    directory mask = 0775       ; 客户端创建目录时的权限掩码
+
+然后启动 smb nmb，
+sudo systemctl start smbsudo systemctl start nmbsudo systemctl enable smbsudo systemctl enable nmb
+
+sudo systemctl status smb
+可能会发现，因为log存放路径没有文件夹，所以存在报错，可以修改smb.conf修改log存放位置，
+...log file = /var/log/samba.%m...
+
+
+配置mihomo将配置文件放入 /etc/mihomo/下，因为 mihomo安装时自动配置了 mihomo的用户和用户组，所以我们直接往 mihomo组里添加用户，
+sudo gpasswd -a tokisaka mihomosudo gpasswd -a root mihomosudo chown -R mihomo:mihomo /etc/mihomo/sudo chmod -R 775 /etc/mihomo/
+
+随后开启 mihomo，并启动开机自启。
+sudo systemctl start mihomosudo systemctl enable mihomo
+
+配置VNC首先安装，并设置vnc密码
+sudo pacman -S tigervncvncpasswd # 创建vnc密码，限制6位数字以上，储存在 $HOME/.config/tigervnc/passwd
+
+编辑 /etc/tigervnc/vncserver.users下的文件，
+sudo vim /etc/tigervnc/vncserver.userssudo vim /etc/tigervnc/vncserver-config-defaults
+
+分别改为如下，
+# TigerVNC user assignment## This file assigns users to specific VNC display numbers.# The syntax is &lt;display&gt;=&lt;username&gt;. E.g.:## :2=andrew# :3=lisa:1=tokisaka #填你的用户名
+
+## Default settings for VNC servers started by the vncserver service## Any settings given here will override the builtin defaults, but can# also be overriden by ~/.config/tigervnc/config and vncserver-config-mandatory.## See HOWTO.md and the following manpages for more details:#     vncsession(8) Xvnc(1)## Several common settings are shown below. Uncomment and modify to your# liking.# session=gnome# securitytypes=vncauth,tlsvnc# geometry=2000x1200# localhost# alwayssharedsession=xfce        # 你可以通过查看/usr/share/xsessions/里的.desktop文件来知道有哪些桌面环境在当前系统上可以使用geometry=1920x1080alwaysshared
+
+最后尝试启动，
+sudo systemctl start vncserver@:1 #这个@后面的数字需要和前面的.user里面对应sudo systemctl status vncserver@:1 vncserver@:1.service - Remote desktop service (VNC)     Loaded: loaded (/usr/lib/systemd/system/vncserver@.service; enabled; preset: disabled)     Active: active (running) since Fri 2025-12-05 15:21:17 CST; 16min ago Invocation: 9928f45da3844b22b0e53bcfc822ce39    Process: 517 ExecStart=/usr/bin/vncsession-start :1 (code=exited, status=0/SUCCESS)   Main PID: 530 (vncsession)      Tasks: 0 (limit: 3640)     Memory: 2.3M (peak: 3.4M)        CPU: 29ms     CGroup: /system.slice/system-vncserver.slice/vncserver@:1.service             ‣ 530 /usr/bin/vncsession tokisaka :112月 05 15:21:14 archlinux systemd[1]: Starting Remote desktop service (VNC)...12月 05 15:21:17 archlinux systemd[1]: Started Remote desktop service (VNC).sudo systemctl enable vncserver@:1
+
+在桌面端使用vnc尝试连接，虽然他只说是address，但是一定要填端口！！！
+这种创建的vnc连接不能和主机屏幕同时存在，所以可以使用x0vncserver来复制画面
+
+
+x0vncserver配置新建/etc/systemd/system/x0vncserver.service创建服务，
+[Unit]Description=Remote desktop service (VNC) for :0 displayRequires=display-manager.serviceAfter=network-online.targetAfter=display-manager.service[Service]Type=simpleEnvironment=HOME=/home/tokisaka/Environment=XAUTHORITY=/var/run/lightdm/root/:0ExecStart=x0vncserver -display :0 -rfbauth /home/tokisaka/.confiig/tigervnc/passwdRestart=on-failureRestartSec=500ms[Install]WantedBy=multi-user.target
+
+例子使用了LightDM，但可以通过修改 XAUTHORITY 变量来将其适用于其他显示管理器。这是一个 system unit, -rfbauth $XDG_CONFIG_HOME/tigervnc/passwd 指向 /root/.vnc/passwd
+
+
+sudo systemctl start x0vncserversudo systemctl enable x0vncserver
+
+以上两种方法似乎不能同时开启。
+
+
+配置VMtoolsVMware会提示你安装VMtools，在老版本中可以直接安装VMtools。 但是在新版本中，需要我们自行下载并安装。
+VMtools官方安装虚拟机设置 &gt; 硬件 &gt; CD&#x2F;DVD &gt; 连接，选择下载的vmtools镜像。
+mount/dev/cdrom on /mnt/cdrom type iso9660 (ro,nosuid,nodev)
+运行mount，有以上输出则镜像挂在成功。进入目录，运行安装脚本。运行途中一路enter
+cd /tmplsmount-pointtar zxpf /mnt/cdrom/VMwareTools-x.x.x-yyyy.tar.gzcd vmware-tools-distribsudo ./vmware-install.pl
+
+运行途中，遇到要你输入 rc*.d 的文件夹，如果找不到这个文件夹可以自行创建。
+cd /etcmkdir -p init.dfor i in &#123;0,1,2,3,4,5,6&#125;; do mkdir re$i.d; done
+
+
+
+但是在Archlinux中，使用官方安装方式是不管用的，我们得自行安装open-vm-tools
+sudo pacman -Syu open-vm-toolssudo systemctl enable --now vmtoold.service
+
+挂载共享文件夹虚拟机设置 &gt; 选项 &gt; 共享文件夹，选择想要与虚拟机共享的主机文件夹。创建挂载点，手动挂载。
+sudo mkdir -p /mnt/hgfssudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other
+
+设置开机自动挂载创建 systemd 挂载服务：
+sudo vim /etc/systemd/system/hgfs.mount
+写入：
+[Unit]Description=VMware HGFS MountAfter=vmtoolsd.service[Mount]What=.host:/Where=/mnt/hgfsType=fuse.vmhgfs-fuseOptions=allow_other[Install]WantedBy=multi-user.target
+启用
+sudo systemctl enable --now hgfs.mount
+
+扩展硬盘首先在虚拟机设置 &gt; 硬件 &gt; 硬盘 &gt; 磁盘实用工具 &gt; 扩展磁盘容量，扩展到你想要的大小。
+扩展磁盘需要在删除原有快照的情况下进行，请注意！！
+
+
+查看分区状况
+lsblkNAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSsda      8:0    0   40G  0 disk├─sda1   8:1    0    1G  0 part /boot└─sda2   8:2    0   39G  0 part /var/log                                /home                                /var/cache/pacman/pkg                                /sr0     11:0    1 53.6M  0 romzram0  253:0    0  1.9G  0 disk [SWAP]
+可以看到根目录 / 位于sda2， 使用 cfdisk 扩展分区
+cfdisk
+
+使用键盘选择上述找到的 sda2分区，选择 更改尺寸，跳到最大，随后 写入 并 保存。
+由于我使用的 btrfs文件系统，所以还需扩展文件系统。
+sudo btrfs filesystem resize max /
+
+
+完成这一切后，执行 df -h查看结果
+╰─❯ df -h文件系统        大小  已用  可用 已用% 挂载点dev             1.9G     0  1.9G    0% /devrun             1.9G  1.3M  1.9G    1% /run/dev/sda2        39G  7.6G   32G   20% /tmpfs           1.9G     0  1.9G    0% /dev/shmtmpfs           1.0M     0  1.0M    0% /run/credentials/systemd-journald.servicetmpfs           1.0M     0  1.0M    0% /run/credentials/systemd-resolved.servicetmpfs           1.0M     0  1.0M    0% /run/credentials/systemd-networkd.servicetmpfs           1.9G  8.0K  1.9G    1% /tmp/dev/sda2        39G  7.6G   32G   20% /var/cache/pacman/pkg/dev/sda2        39G  7.6G   32G   20% /home/dev/sda2        39G  7.6G   32G   20% /var/log/dev/sda1      1022M   42M  981M    5% /boottmpfs           388M   52K  388M    1% /run/user/1000vmhgfs-fuse     932G  382G  550G   42% /mnt/hgfs
+
+看到 /大小变大则说明成功啦！
+
+
+
+
+        
+          2025
+
+        
+      
+        
+          12-22
+
+        
+        新增fishshell使用nvm的状况
+
+      
+        
+          11-15
+
+        
+        第一次发布
+
+      ]]></content>
+      <tags>
+        <tag>指南 - linux - shell - fish</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>code-server配置中文以及contine</title>
+    <url>/2026/04/02/code-server%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E4%BB%A5%E5%8F%8Acontinue/</url>
+    <content><![CDATA[很久之前就为code-erver没法设置中文而困扰，这次终于在网上搜到怎么解决了，可得赶紧记录下来防止以后忘记。
+
+安装code-serversudo pacman -S code-srever
+要下载的是code-server而不是openvscode-srever,后者是开源版本
+
+
+安装完成后，有两个服务被创建，分别是/usr/lib/systemd/system/code-server@.service和/usr/lib/systemd/user/code-server.service，前者是以系统级服务运行，可以为所有用户提供服务，后者是以用户级服务运行，仅在特定用户的上下文中运行，我使用后者
+systemctl --user enable code-serversystemctl --user start code-server
+默认的配置文件位置在~/.config/code-server/config.yaml,可以按需修改
+配置中文先按一般vscode来安装中文扩展，这时候发现不管怎么重启界面都不会变成中文
+以下内容摘自Vscode&#x2F;Code-Server 安装中文包——CI&#x2F;CD
+
+
+看样子是因为languagepacks.json没有正确生成，直接使用大佬的脚本可以直接解决
+#!/bin/bash# 定义路径EXTENSIONS_DIR=&quot;$HOME/.local/share/code-server/extensions&quot;OUTPUT_DIR=&quot;$HOME/.local/share/code-server&quot;LANGUAGE_PACK_PREFIX=&quot;ms-ceintl.vscode-language-pack-&quot;# 定义输出文件LANGUAGEPACKS_FILE=&quot;$OUTPUT_DIR/languagepacks.json&quot;ARGV_FILE=&quot;$OUTPUT_DIR/User/argv.json&quot;EXTENSIONS_JSON=&quot;$EXTENSIONS_DIR/extensions.json&quot;# 创建 User 目录（如果不存在）mkdir -p &quot;$(dirname &quot;$ARGV_FILE&quot;)&quot;# 查找语言包目录LANGUAGE_PACK_FOLDER=$(find &quot;$EXTENSIONS_DIR&quot; -type d -name &quot;$&#123;LANGUAGE_PACK_PREFIX&#125;*&quot; | head -n 1)# 检查语言包文件夹是否存在if [ -z &quot;$LANGUAGE_PACK_FOLDER&quot; ]; then  echo &quot;未找到语言包文件夹，请确保路径正确。&quot;  exit 1fi# 从 package.json 中提取数据PACKAGE_JSON=&quot;$LANGUAGE_PACK_FOLDER/package.json&quot;if [ ! -f &quot;$PACKAGE_JSON&quot; ]; then  echo &quot;未找到 package.json 文件，请检查语言包目录。&quot;  exit 1fi# 从 extensions.json 中提取 UUIDif [ ! -f &quot;$EXTENSIONS_JSON&quot; ]; then  echo &quot;未找到 extensions.json 文件，请检查路径。&quot;  exit 1fiLANGUAGE_PACK_NAME=$(jq -r &#x27;.name&#x27; &quot;$PACKAGE_JSON&quot;)echo &quot;找到语言包: $LANGUAGE_PACK_NAME&quot;LANGUAGE_PACK_UUID=$(jq -r --arg id &quot;ms-ceintl.$LANGUAGE_PACK_NAME&quot; &#x27;.[] | select(.identifier.id == $id) | .identifier.uuid&#x27; &quot;$EXTENSIONS_JSON&quot;)if [ -z &quot;$LANGUAGE_PACK_UUID&quot; ]; then  echo &quot;未能在 extensions.json 中找到对应语言包的 UUID&quot;  exit 1fi# 提取其他必要信息LANGUAGE_ID=$(jq -r &#x27;.contributes.localizations[0].languageId&#x27; &quot;$PACKAGE_JSON&quot;)LANGUAGE_LABEL=$(jq -r &#x27;.contributes.localizations[0].localizedLanguageName&#x27; &quot;$PACKAGE_JSON&quot;)LANGUAGE_PACK_VERSION=$(jq -r &#x27;.version&#x27; &quot;$PACKAGE_JSON&quot;)# 动态生成 translationsTRANSLATIONS=$(jq -n --arg dir &quot;$LANGUAGE_PACK_FOLDER&quot; --argjson translations &quot;$(jq &#x27;.contributes.localizations[0].translations&#x27; &quot;$PACKAGE_JSON&quot;)&quot; &#x27;  reduce $translations[] as $item (&#123;&#125;; . + &#123;($item.id): &quot;\($dir)/\($item.path)&quot;&#125;)&#x27;)# 生成 languagepacks.jsonHASH=$(echo -n &quot;$LANGUAGE_PACK_UUID$LANGUAGE_PACK_VERSION&quot; | md5sum | awk &#x27;&#123;print $1&#125;&#x27;)cat &gt; &quot;$LANGUAGEPACKS_FILE&quot; &lt;&lt;EOL&#123;    &quot;$&#123;LANGUAGE_ID&#125;&quot;: &#123;        &quot;hash&quot;: &quot;$&#123;HASH&#125;&quot;,        &quot;extensions&quot;: [            &#123;                &quot;extensionIdentifier&quot;: &#123;                    &quot;id&quot;: &quot;$&#123;LANGUAGE_PACK_NAME&#125;&quot;,                    &quot;uuid&quot;: &quot;$&#123;LANGUAGE_PACK_UUID&#125;&quot;                &#125;,                &quot;version&quot;: &quot;$&#123;LANGUAGE_PACK_VERSION&#125;&quot;            &#125;        ],        &quot;translations&quot;: $&#123;TRANSLATIONS&#125;,        &quot;label&quot;: &quot;$&#123;LANGUAGE_LABEL&#125;&quot;    &#125;&#125;EOL# 格式化 languagepacks.jsonjq &#x27;.&#x27; &quot;$LANGUAGEPACKS_FILE&quot; &gt; &quot;$LANGUAGEPACKS_FILE.tmp&quot; &amp;&amp; mv &quot;$LANGUAGEPACKS_FILE.tmp&quot; &quot;$LANGUAGEPACKS_FILE&quot;echo &quot;languagepacks.json 已生成并格式化: $LANGUAGEPACKS_FILE&quot;# 生成 argv.jsoncat &gt; &quot;$ARGV_FILE&quot; &lt;&lt;EOL&#123;    &quot;locale&quot;: &quot;$&#123;LANGUAGE_ID&#125;&quot;&#125;EOL# 格式化 argv.jsonjq &#x27;.&#x27; &quot;$ARGV_FILE&quot; &gt; &quot;$ARGV_FILE.tmp&quot; &amp;&amp; mv &quot;$ARGV_FILE.tmp&quot; &quot;$ARGV_FILE&quot;echo &quot;argv.json 已生成并格式化: $ARGV_FILE&quot;
+
+配置contine插件因为没有https没法用这个插件，所以最好还是做一个证书。
+sudo pacman -S mkcertmkcert -installmkcert localhost 127.0.0.1 ::1              # 生成证书，适用于本地开发mkcert myproject.local                  # 或者如果你有自定义域名
+
+这会生成 localhost+2.pem 和 localhost+2-key.pem 两个文件,编辑你的 code-server 配置文件
+nvim ~/.config/code-server/config.yaml# ~/.config/code-server/config.yamlbind-addr: 127.0.0.1:8080auth: passwordpassword: your_password_herecert: /path/to/localhost+2.pemcert-key: /path/to/localhost+2-key.pem
+然后重新启动code-sercer
+把cert复制到你客户端的机器上，windows的话需要修改后缀为crt，双击证书，给本地计算机安装，选择受信任的根证书颁发机构
+感谢
+Anye
+
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>easytier部署与异地组网</title>
+    <url>/2026/05/08/easytier%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%BC%82%E5%9C%B0%E7%BB%84%E7%BD%91/</url>
+    <content><![CDATA[早就听闻easytier的强大，于是想试一试
+安装easytier控制台从easytier官网找到下载链接，解压后放到$PATH里，因为我的控制台这台vps同时也担任中转服务器，所以使用easytier-web-embed同时开启web和中转。使用以下命令新建一个服务。（使用包管理器似乎会自动创建一个）
+cat &gt; /etc/systemd/system/easytier-web-embed.service &lt;EOF[Unit]Description=easytier-web-embed ServiceAfter=network.target[Service]Type=simpleExecStart=/usr/local/bin/easytier-web-embed \    --api-server-port 11211 \    --api-host &quot;http://0.0.0.0:11211&quot; \    --config-server-port 22020 \    --config-server-protocol tcpUser=rootRestart=on-failureRestartSec=5[Install]WantedBy=multi-user.targetEOFsudo systemctl enable easytier-web-embed
+
+–api-server-port: web前后端的端口
+–api-host: 在web前端指定web api后端的访问地址（不设你就只能在web前端手动指定api后端地址）
+–config-server-port: 用于easytier-core连接的配置下发端的端口
+–config-server-protocol: 用于easytier-core连接的配置下发端的协议（支持 tcp, udp, ws）
+–web-server-port: 额外监听web前端的端口（注：此设置不受 –no-web 影响）
+–no-web: 不运行web前端（关闭 –api-server-port 端口的前端功能）
+
+
+
+
+配置easytier控制台浏览器打开上面设置的api-host地址，（也可以设置反代来绑定域名），来到登录页面。首次使用需要先注册，值得注意的是，api-host需要和你的链接相同，同时最好使用https访问，还需要解决跨域问题，不然注册不了。最简单快捷的方式就是修改浏览器启动参数
+.\chrome.exe --disable-web-security
+
+登录-&gt;设备列表能看到我们的localhost，进入设置，新建一个网络。虚拟IPv4地址填上你想要的内网地址，不要和其他地址冲突，设置网络名称和密码，这决定了其他人能否加入你的网络。初始节点可以不填，但如果设备网络比较封闭，最好还是填一下。以下是网上收集的一些共享节点。
+[[peer]]uri = &quot;tcp://sh.vomiku.com:7910&quot;[[peer]]uri = &quot;tcp://public.easytier.top:11010&quot;[[peer]]uri = &quot;tcp://easytier.hyc.icu:11010&quot;[[peer]]uri = &quot;tcp://8.138.6.53:11010&quot;[[peer]]uri = &quot;tcp://119.23.65.180:11010&quot;[[peer]]uri = &quot;tcp://gz.minebg.top:11010&quot;[[peer]]uri = &quot;tcp://39.108.52.138:11010&quot;[[peer]]uri = &quot;tcp://turn.hb.629957.xyz:11010&quot;[[peer]]uri = &quot;tcp://8.148.29.206:11010&quot;[[peer]]uri = &quot;tcp://turn.js.629957.xyz:11012&quot;[[peer]]uri = &quot;tcp://103.194.107.246:11010&quot;[[peer]]uri = &quot;tcp://sh.993555.xyz:11010&quot;[[peer]]uri = &quot;tcp://turn.bj.629957.xyz:11010&quot;[[peer]]uri = &quot;tcp://et.sh.suhoan.cn:11010&quot;[[peer]]uri = &quot;tcp://96.9.229.212:11010&quot;[[peer]]uri = &quot;tcp://et-hk.clickor.click:11010&quot;[[peer]]uri = &quot;tcp://47.113.227.73:11010&quot;[[peer]]uri = &quot;tcp://et.01130328.xyz:11010&quot;[[peer]]uri = &quot;tcp://et.ie12vps.xyz:11010&quot;[[peer]]uri = &quot;tcp://103.40.14.90:35971&quot;[[peer]]uri = &quot;tcp://47.103.35.100:11010&quot;[[peer]]uri = &quot;tcp://et.gbc.moe:11011&quot;[[peer]]uri = &quot;tcp://116.206.178.250:11010&quot;[[peer]]uri = &quot;txt://qtet-public.070219.xyz&quot;[[peer]]uri = &quot;https://et-public.lctn.site/&quot;[[peer]]uri = &quot;tcp://public2.easytier.cn:54321&quot;[[peer]]uri = &quot;tcp://et.fpfast.top:48625&quot;[[peer]]uri = &quot;udp://43.139.65.49:11010&quot;[[peer]]uri = &quot;tcp://47.92.208.217:11010&quot;[[peer]]uri = &quot;tcp://sh.vomiku.com:7910&quot;[[peer]]uri = &quot;tcp://47.108.52.1:11012&quot;[[peer]]uri = &quot;tcp://boi.de5.net:11010&quot;[[peer]]uri = &quot;tcp://c.oee.icu:60006&quot;[[peer]]uri = &quot;tcp://easytier.weiai.org.cn:11010&quot;[[peer]]uri = &quot;tcp://103.217.186.78:11011&quot;[[peer]]uri = &quot;tcp://154.9.255.133:11010&quot;[[peer]]uri = &quot;tcp://0.0.0.0:11010&quot;
+
+打开高级设置，启用开启延迟优先模式,启用 KCP 代理,启用多线程,仅使用物理网卡,系统转发,启用网络白名单-&gt;填入虚拟网络名字，这将仅为该虚拟网络提供转发服务。运行网络即会开始启动。
+配置easytier客户端同样安装easytier，连接上config-server
+easytier-core tcp://xxx.xxx.xxx.xxx:22020/uasername --lazy-p2p
+不带参数启动，可以直接将服务器作为中继服务器而不加入网络
+easytier-core
+
+也可以配置成服务。linux:
+cat &gt;/etc/systemd/system/easytier.service &lt;EOF[Unit]Description=easytier-core ServiceAfter=network.target[Service]Type=simpleExecStart=/usr/local/bin/easytier-core --config-server tcp://xxx.xxx.xxx.xxx/nameUser=rootRestart=on-failureRestartSec=5[Install]WantedBy=multi-user.targetEOF
+win:先安装winsw，重命名winsw为想要的服务名，新建一个服务名.xml，放到同一个目录下，编辑这个xml
+&lt;service&gt;  &lt;id&gt;easytier-core&lt;/id&gt;  &lt;name&gt;EasyTier Core Service&lt;/name&gt;  &lt;description&gt;EasyTier 异地组网核心服务&lt;/description&gt;    &lt;executable&gt;C:\easytier\easytier-core.exe&lt;/executable&gt;    &lt;arguments&gt;--config-server tcp://205.100.113.63:22020/tokisaka --lazy-p2p&lt;/arguments&gt;    &lt;startmode&gt;Manual&lt;/startmode&gt;    &lt;logpath&gt;D:\cache\logs\easytier&lt;/logpath&gt;    &lt;log mode=&quot;roll-by-size&quot;&gt;    &lt;sizeThreshold&gt;10240&lt;/sizeThreshold&gt;    &lt;keepFiles&gt;8&lt;/keepFiles&gt;  &lt;/log&gt;&lt;/service&gt;
+
+在网页控制台能看到该设备，同样新建网络，填入另一个同网段的不同ip地址，填入同一个网络名和密码，填入中转服务器的初始节点。进入高级设置，启用启用 KCP 代理,启用多线程,仅使用物理网卡,系统转发，启用网络白名单-&gt;填入虚拟网络名字，运行网络。
+子网代理编辑内网设备的easytier虚拟网络设置，高级设置-&gt;子网代理，填入内网ip网段。并在需要访问内网的设备上easytier虚拟网络设置自定义路由填入内网网段。
+路由器配置easytier从luci-app-easytier获得安装包，
+一般路由器都选这个EasyTier-v2.6.2-aarch64_cortex-a53-22.03.7.zip
+
+
+下载下来的压缩包长这样，
+   Date      Time    Attr         Size   Compressed  Name------------------- ----- ------------ ------------  ------------------------2026-04-29 15:26:10 .....     14651938     14654173  easytier_2.6.2_aarch64_cortex-a53.ipk2026-04-29 15:26:10 .....        69899        69914  luci-app-easytier_2.6.2_all.ipk2026-04-29 15:26:10 .....        15153        15153  luci-i18n-easytier-zh-cn_git-26.117.43909-ca9e2d6_all.ipk------------------- ----- ------------ ------------  ------------------------2026-04-29 15:26:10           14736990     14739240  3 files
+luci-app-easytier_2.6.2_all.ipk luci-i18n-easytier-zh-cn_git-26.117.43909-ca9e2d6_all.ipk这两个是openwrt的软件包，easytier_2.6.2_aarch64_cortex-a53.ipk是easytier的安装包，所以实际上可以不使用他的，而是选择自己去下载
+同样的选择easytier-linux-aarch64-v2.6.3.zip
+
+
+安装完之后刷新或注销openwrt的网页，就能在VPN -&gt; easytier找到这个软件。
+首先前往上传程序栏，把刚刚下载的二进制文件上传上去，
+注意要把easytier-web程序路径修改成/usr/bin/easytier-web-embed,然后通过其他方式将easytier-web-embed放到文件夹/usr/bin/，记得给执行权限
+
+
+修改easytier配置，勾选启用，启动方式选择web配置，web服务器地址改为tcp://web控制台ip:22020/username
+安卓端配置offical appmagisk moudle安卓端可以使用官方app
+
+Android客户端
+
+客户端界面与web控制台界面如出一辙，填入web控制台地址即可加入虚拟网络
+因为事实上我没用过，所以这部分没法保证
+magisk moudle
+刷入后，前往/data/adb/modules/easytier_magisk/config/，修改config.toml后重启手机即可启动。
+
+鸣谢：EasyTier在openwrt上部署教程【保姆级教程】Easytier异地组网部署记录
+
+
+
+
+
+        
+          2026
+
+        
+      
+        
+          05-31
+
+        
+        首次配置完成
+
+      ]]></content>
+      <tags>
+        <tag>openwrt</tag>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git清理体积过大的二进制文件</title>
+    <url>/2025/11/11/git%E6%B8%85%E7%90%86%E4%BD%93%E7%A7%AF%E8%BF%87%E5%A4%A7%E7%9A%84%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6/</url>
+    <content><![CDATA[前言git仓库中常常不小心混入体积过大的二进制文件，这使得仓库体积过大，严重影响拉取效率，所以清理这些文件势在必行。
+
+
+    flowchart LR
+	A[git gc整理] --&gt; B[git rev-list定位];
+	A[git gc整理] --&gt; C[BFG Repo-Cleaner定位并清理];
+	B[git rev-list定位] --&gt; D[git filter-repo清理];
+	B[git rev-list定位] --&gt; E[git filter-branch清理];
+	D[git filter-repo清理] --&gt; F[git reflog &amp;&amp; git gc];
+	E[git filter-branch清理] --&gt; F[git reflog &amp;&amp; git gc];
+	C[BFG Repo-Cleaner定位并清理] --&gt; F[git reflog &amp;&amp; git gc];
+	F[git reflog &amp;&amp; git gc] --&gt; G[git push];
   
+
+整理git文件git gc
+
+定位过大的二进制文件linux]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LGG8X的9008救砖</title>
+    <url>/2026/01/04/LGG8X%E7%9A%849008%E6%95%91%E7%A0%96/</url>
+    <content><![CDATA[刷内核翻车了，重新刷入原版boot依旧卡第一屏，所有需要9008救砖，这会儿正在下载kdz，趁现在记录一下。防止以后再次翻车。
+事前准备必要的软件：
+
+LGUP及其UI扩展，驱动
+QFIL及其USB驱动
+LGG8X的分区表
+
+各软件的安装 从我备份的地方下载。
+ mkdir -p lg &amp;&amp; cd lgrclone copy -P backup://lg/QPST_2.7.496 . --transfers=12rclone copy -P backup://lg/LGUP1.16和UI_Config.lgl . --transfers=12rclone copy -P backup://lg/KDZTools/G850UM40c_00_1129.kdz --transfers=12rclone copy -P backup://lg/骁龙855/prog_ufs_firehose_sm8150_lge.elfprog_ufs_firehose_sm8150_lge.elf --transfers=12
+
+去QPST_2.7.496双击QPST.2.7.496.1.exe安装QFIL,去QPST_2.7.496\Driver\目录下，双击Qualcomm USB Driver V1.0.exe安装高通9008驱动。
+去LGUP1.16和UI_Config.lgl，启动LG.4.2.exe安装驱动，启动LGUP_Lab_Frame_Ver_1_16_0_3.msi安装LGUP本体，去C:\Program Files (x86)\LG Electronics\LGUP\model\Common下，启动LGUP_Common_DLL_Ver_1_0_40_2.msi安装库。复制LGUP1.16和UI_Config.lgl\UI_Config.lgl到C:\Program Files (x86)\LG Electronics\LGUP\model\Common，因为LGUP运行时会修改该文件，所以我们需要将其设置为只读
+9008备份清除分区
+进入9008
+
+首先我们打开电脑安装的QFIL，右下角storage type选择ufs，Select build type选择flat build，select programmer的programmer path选择我们下载的sm8150_lge.elf，在手机关机状态通过USB连接电脑，长按电源键和音量-，在屏幕熄屏时，不松手，另一只手狂按音量+，在电脑听见一声‘嘟’后立刻松手，select port选择我们的设备，在上面选择tools-&gt;partition manager，在弹出的表格里，
+如果你进入9008模式太久没有操作，这个表格会弹出的很慢，在等待一段时间后，消息栏弹出Download Fail sahara fail QSaharaServer Fail Process Fail，这时候重新按手机进入9008就好
+
+
+
+备份分区
+
+在你选择的分区上右击，弹出一个菜单，选择manage partition data后进入二级菜单，erase擦除数据，read image导出分区，load image则是写入分区。我们对如下ftm,fsg,fsc,modemst1,modemst2,modem_a,modem_b进行备份操作，导出的位置会显示在下面的消息栏，
+导出的分区文件名是无序的，建议手动修改成自己认得的文件名
+
+
+
+擦除分区
+
+我们对如下ftm,modem_a,modem_b,sid_a,sid_b,op_a,op_b,userdata进行擦除操作，完成后一路close，直到消息栏弹出finish reset to EDL才算完成。
+Erase按钮，千万不要选成一级菜单的Erase Enter Flash
+
+
+LGUP刷入KDZ因为我们已经修改过UI了，直接打开LGUP，虽然会弹出一个报错，但是无视他。
+
+进入download mode同9008一样，长按电源和音量-，在熄屏后立刻松开电源和音量-，同时按住音量+不松手，即可进入download mode
+
+刷入KDZ混刷要选择partition DL模式，file path选择我们的kdz，直接start开始刷入，虽然会弹出一个选框，我们select all，然后取消选中sid_a``sid_b然后刷入，静待片刻，刷完手机会自动重启。
+
+
+]]></content>
+      <tags>
+        <tag>刷机</tag>
+        <tag>安卓</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2026/04/03/hello-world/</url>
+    <content><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+Quick StartCreate a new post$ hexo new &quot;My New Post&quot;
+
+More info: Writing
+Run server$ hexo server
+
+More info: Server
+Generate static files$ hexo generate
+
+More info: Generating
+Deploy to remote sites$ hexo deploy
+
+More info: Deployment
+]]></content>
+  </entry>
+  <entry>
+    <title>navicat premium 16 破解安装</title>
+    <url>/2026/06/02/navicat-premium-16-%E7%A0%B4%E8%A7%A3%E5%AE%89%E8%A3%85/</url>
+    <content><![CDATA[因为新版本的navacat整合了一堆AI功能，搞得软件占用特别大，所以只好去使用老版本的软件，恰好又看见16.0可以使用注册机注册。
+软件安装因为注册机暂时最多支持navicat premium 16版本，所以当前最新版是没法使用用注册机的，我们得去下载老版本。
+
+官网
+
+navicat160表示16.0版本，依次类推163表示16.3版本。但是到了17.0这个大版本后命名规则变成17_了。
+
+
+经过我的实践16.3版本是没法注册机破解的，很可惜了
+
+
+为了防止官方哪天不给下载了，我还留了备份
+
+备份
+
+注册机下载依旧有备份
+
+navicat crack
+
+使用流程安装完navicat之后先不要打开。以管理员身份运行NavicatCracker.exe。
+选择安装路径
+
+确认安装补丁
+
+这时候我们在打开navicat，断开网络，让他给我们手动激活的机会
+如果不想整台电脑断网，也不想安装什么软件的话，最快速的针对性的断网方法是使用windwos防火墙
+打开高级安全Windows Defender防火墙-&gt;出站规则-&gt;新建规则，规则类型选择程序，选择程序路径，剩下的默认，最后阻止连接
+
+
+
+转到navicat crack点击Generate生成Keygen，点击Copy，粘贴到navicat注册页面中！点击激活，弹出不出意料地弹窗,选择手动激活
+
+复制请求码，粘贴到navicat crack中，生成激活码，最后再把激活码填回去
+
+最后，直接激活！！！
+激活完成后可以删除防火墙规则啦，可以用过帮助-&gt;检查更新查看是否可以联网，但是我激活完之后防火墙规则莫名不见了，而且数据库也连不上。这种情况重启电脑就好了
+
+
+鸣谢：Navicat Premium 16 永久破解激活
+]]></content>
+      <tags>
+        <tag>windows</tag>
+        <tag>破解</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>openWRT使用wireguard实现异地组网</title>
+    <url>/2026/01/10/openWRT%E4%BD%BF%E7%94%A8wireguard%E5%AE%9E%E7%8E%B0%E5%BC%82%E5%9C%B0%E7%BB%84%E7%BD%91/</url>
+    <content><![CDATA[老早就像折腾这个了，终于有个机会了。
+软件安装系统-&gt;软件包里搜索 luci-proto-wireguard qrencode ddns-go安装。
+luci-proto-wireguard是软件本体，而qrencode是二维码编码器，用来快速的往我们的设备里导入配置的，ddns-go是带webui的动态域名解析软件
+
+
+动态域名配置使用cloudflare因为我们只有ipv6公网地址，而这个地址又是变化的，所以我们要跑一个程序，来不断地拿ip地址解析到域名上。
+安装ddns-go后，前往服务-&gt;DDNS-Go，启用。‘打开web界面’，首次打开需要设置用户名密码。在DNS服务商中，选择你的dns域名解析提供商，我的是cloudflare，填入我们的token，TTL选自动。ipv4没有公网ip取消启用，ipv6选择通过wan网卡获取。一般来说第一个就是ipv6公网ip，所以正则表达式不需要配置。Domain填入我们想解析到的子域名，选择保存，则会自动将我们的ipv6公网ip解析到域名上，可以前往cloudflare查看。
+使用dynv6.com前往dynv6，自行注册账号。首次注册需要自己填一个地址。
+
+需要填入ipv4地址和ipv6前缀，最好置空，不然后面会抢答ipv4
+
+
+注册域之后直接给我们用户名和密码
+前往路由器后台，软件包管理下载luci-i18n-ddns-zh-cn，会自动下载一套。进入配置页，点击其中一项服务编辑，服务提供商选择dynv6.com，ip地址版本选择ipv6，域名就填我们注册的域名，用户名用none，密码则是网页显示的密码。进入高级设置，ip地址来源选择地址，IP检查URL选择他推荐的http://checkipv6.dyndns.com，事件网络选择wan_6，定时器可以自行选择更新间隔，保存好启动DDNS。看到服务运行中并且域名和注册的ip都显示出来就运行成功了
+需要注意的是，ddns服务提供商的密码是使用““包起来的，记得自行删去，事件网络可能也可以选择lan
+
+
+配置wireguard服务端网络-&gt;接口，左下角点击添加新接口，端口名字自定义，我管他叫wg0，协议选择wireguard，勾选开机自动连接，私钥 公钥都可以通过生成新的密钥对来自动生成，监听端填入51820默认端口，ip地址填入192.168.5.1/24
+192.168.5.1/24是新创建的虚拟内网的网段，不能和你原本的内网网段相冲突！！
+
+
+高级设置中MTU填入1280，***取消***勾选使用该接口的网关作为默认网关，转到防火墙设置，选择创建新的防火墙wg，转到对端设置，创建一个新的对端，描述自定义，我选择管他叫‘iOS’，公钥 私钥 预共享密钥全都点击自动生成，允许的ip填入192.168.5.2/32
+192.168.5.2/32是前一步创建的虚拟内网的网段，但是不可以和上面的或者其他的对端设备的内网ip冲突！！
+
+
+勾选为允许的IP创建路由，持续保持连接填入25。在最底下的配置导出点击生成配置，连接端点填入我们在DDNS-GO中解析的域名，允许的ip保持默认。
+默认的值0.0.0.0/0 ::/0表示你可以通过这个wireguard接口可以访问的网段，此时你可以通过这个访问整个互联网。如果你设置成192.168.5.1/24 10.0.0.1/24则表示你仅可以访问虚拟内网192.168.5.1/24和你的家庭内网10.0.0.1/24。
+
+
+务必将允许的ip填入到配置导出-&gt;生成配置页面的对应输入框，这才是客户端的配置设置，上级是服务端的配置，填错可能导致内网无法访问到路由器
+
+地址填入你的家庭内网dns，比如我这里就是10.0.0.1，地址则像前面一样填入192.168.5.2/32。其实这些设置都可以在客户端填，但是在这里填可以直接扫码导入。好，接下来我们掏出手机，安装wireguard手机客户端，扫二维码添加隧道。
+
+    [{"url":"https://cdn-cos.2254134.xyz/2026/01/10/696259df9c0a2.png","alt":"","title":""},{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625a873d1f7.png","alt":"","title":""},{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625a87ddafb.png","alt":"","title":""},{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625a88e4533.png","alt":"","title":""},{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625a8a6cd3b.png","alt":"","title":""}]
   
-    
-    <entry>
-      <title>archlinux安装及配置</title>
-      <link href="/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/"/>
-      <url>/2024/12/24/archlinux%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/</url>
-      
-        <content type="html"><![CDATA[<h4 id="事前准备"><a href="#事前准备" class="headerlink" title="事前准备"></a>事前准备</h4><ol><li><pre><code>一个U盘</code></pre></li><li><pre><code>archlinux [ISO镜像](https://mirrors.aliyun.com/archlinux/iso/2024.12.01/)</code></pre></li></ol><h3 id="正式开始"><a href="#正式开始" class="headerlink" title="正式开始"></a>正式开始</h3><ol><li><pre><code>进入bios,选择从U盘启动</code></pre></li><li><pre><code>禁用reflector</code></pre><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl stop reflector.service</span><br></pre></td></tr></table></figure></li><li>检查<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl status reflector.service</span><br></pre></td></tr></table></figure></li><li>更改国内源<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/pacman.d/mirrorlist</span><br></pre></td></tr></table></figure>改为以下内容<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Server = https://mirrors.ustc.edu.cn/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 中国科学技术大学开源镜像站</span></span><br><span class="line">Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 清华大学开源软件镜像站</span></span><br><span class="line">Server = https://repo.huaweicloud.com/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 华为开源镜像站</span></span><br><span class="line">Server = http://mirror.lzu.edu.cn/archlinux/<span class="variable">$repo</span>/os/<span class="variable">$arch</span> <span class="comment"># 兰州大学开源镜像站</span></span><br></pre></td></tr></table></figure></li><li>archinstall脚本安装<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">archinstall</span><br></pre></td></tr></table></figure><blockquote><p>mirror region选择china的话，连接163镜像可能会很慢，还请使用变量挂代理。</p><blockquote><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;<span class="built_in">export</span> http_proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure><p>locale设置zh_CN.UTF-8的话，桌面环境可能会出现字体问题，需要额外安装包<code>noto-fonts-cjk</code> <code>wqy-bitmapfont</code> <code>wqy-zenhei</code></p></blockquote></blockquote></li></ol><h3 id="安装完成开始配置"><a href="#安装完成开始配置" class="headerlink" title="安装完成开始配置"></a>安装完成开始配置</h3><ol start="6"><li><pre><code>等待更新完成，更新仓库</code></pre><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -Syy</span><br></pre></td></tr></table></figure></li><li><pre><code>安装必备软件</code></pre><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S git p7zip docker docker-compose timeshift fcitx5 fcitx5-im fcitx5-chinese-addons fcitx5-anthy</span><br></pre></td></tr></table></figure></li><li><h4 id="设置代理"><a href="#设置代理" class="headerlink" title="设置代理"></a>设置代理</h4></li></ol><p>把mihomo配置文件们放到<code>/etc/mihomo</code>下,直接设置777权限</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chmod</span> 777 -R /etc/mihomo</span><br></pre></td></tr></table></figure><p>把mihomo二进制可执行文件<code>mihomo</code>放到<code>/usr/local/bin/</code>并给予可执行权限</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chmod</span> +x /usr/local/bin/mihomo</span><br></pre></td></tr></table></figure><p>创建运行服务，先进入<code>/etc/systemd/system/</code>,新建<code>mihomo.service</code></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/systemd/system/</span><br><span class="line"><span class="built_in">sudo</span> vim mihomo.service</span><br></pre></td></tr></table></figure><p>内容为下:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=mihomo Daemon, Another Clash Kernel.</span><br><span class="line">After=network.target NetworkManager.service systemd-networkd.service iwd.service</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">LimitNPROC=500</span><br><span class="line">LimitNOFILE=1000000</span><br><span class="line">CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACECAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE</span><br><span class="line">AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE</span><br><span class="line">Restart=always</span><br><span class="line">ExecStartPre=/usr/bin/sleep 1s</span><br><span class="line">ExecStart=/usr/local/bin/mihomo -d /etc/mihomo</span><br><span class="line">ExecReload=/bin/kill -HUP <span class="variable">$MAINPID</span></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure><p>重载systemd：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl daemon-reload</span><br></pre></td></tr></table></figure><p>启用并启动mihomo:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> mihomo</span><br><span class="line"><span class="built_in">sudo</span> systemctl start mihomo</span><br></pre></td></tr></table></figure><p>查看运行状态:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl status mihomo</span><br></pre></td></tr></table></figure><p>查看日志：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -u mihomo -o <span class="built_in">cat</span> -e</span><br></pre></td></tr></table></figure><ol start="9"><li><h4 id="配置paru"><a href="#配置paru" class="headerlink" title="配置paru"></a>配置paru</h4></li></ol><p>安装必要组件并克隆paru源代码</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S --needed base-devel</span><br><span class="line">git <span class="built_in">clone</span> https://aur.archlinux.org/paru.git</span><br></pre></td></tr></table></figure><p>编译并安装paru</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> paru</span><br><span class="line">makepkg -si</span><br></pre></td></tr></table></figure><p>启用paru颜色,取消<code>#Color</code>的注释</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/pacman.conf</span><br></pre></td></tr></table></figure><p>paru基本命令：</p><ul><li><code>paru &lt;用户输入&gt;</code> : 搜索并安装“用户输入”</li><li><code>paru -</code> : <code>paru -Syu</code>的别名</li><li><code>paru -Sua</code> : 仅升级 AUR 包。</li><li><code>paru -Qua</code> : 打印可用的 AUR 更新</li><li><code>paru -Gc &lt;用户输入&gt;</code> ： 显示“用户输入”的 AUR 评论</li></ul><ol start="10"><li><h4 id="配置VNC"><a href="#配置VNC" class="headerlink" title="配置VNC"></a>配置VNC</h4></li></ol><p>下载vncserver</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S tigervnc</span><br></pre></td></tr></table></figure><p>设置用户和密码</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vncpasswd</span><br></pre></td></tr></table></figure><p>编辑<code>/etc/tigervnc/vncserver.users</code>来定义用户映射。<br>该文件中定义的每个用户都会拥有对应的端口来运行会话。<br>默认情况下，:1 是 TCP 端口 5901 (5900+1如果需要运行一个并行的服务端，第二个实例可以运行在下一个最大的、未被占用的端口，即 5902 (5900+2)。<br>创建<code>~/.vnc/config</code>,内容为下:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">session=xfce</span><br><span class="line">geometry=1920x1080</span><br><span class="line">localhost</span><br><span class="line">alwaysshared</span><br></pre></td></tr></table></figure><blockquote><p><code>session=foo</code> （将foo替换为你想要运行的桌面环境）。<br>你可以通过查看 &#x2F;usr&#x2F;share&#x2F;xsessions&#x2F; 里的 .desktop 文件来知道有哪些桌面环境在当前系统上可以使用。<br>    创建vncserver服务，复制示例文件</p></blockquote><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> /usr/lib/systemd/system/vncserver.service /etc/systemd/system/vncserver@:1.service</span><br></pre></td></tr></table></figure><p>创建<code>~/.vnc/.xstartup</code>,内容为</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xrdb ~/.Xresource</span><br><span class="line">startxfce4</span><br></pre></td></tr></table></figure><blockquote><p>上为xfce4桌面，如果是kde则写<code>startplasma-wayland</code><br>启用vncserver</p></blockquote><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> vncserver@:1.service</span><br><span class="line"><span class="built_in">sudo</span> systemctl start vncserver@:1.service</span><br></pre></td></tr></table></figure><ol start="11"><li><h4 id="配置x0vncserver"><a href="#配置x0vncserver" class="headerlink" title="配置x0vncserver"></a>配置x0vncserver</h4></li></ol><p>直接启动x0vncserver</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x0vncserver -rfbauth ~/.vnc/passwd</span><br></pre></td></tr></table></figure><blockquote><p>以上为archwiki内容,经过我的观察，现在vnc的password生成在<code>~/.config/tigervnc/passwd</code>,所以代码应该修改为</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x0vncserver -rfbauth ~/.config/tigervnc/passwd</span><br></pre></td></tr></table></figure></blockquote><p>使用systemd启停x0vncserver<br>创建<code>/etc/systemd/system/x0vncserver.service</code>，</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/systemd/system/</span><br><span class="line"><span class="built_in">sudo</span> vim x0vncserver.service</span><br></pre></td></tr></table></figure><p>内容如下:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Remote desktop service (VNC) <span class="keyword">for</span> :0 display</span><br><span class="line">Requires=display-manager.service</span><br><span class="line">After=network-online.target</span><br><span class="line">After=display-manager.service</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">Environment=HOME=/root</span><br><span class="line">Environment=XAUTHORITY=/var/run/lightdm/root/:0</span><br><span class="line">ExecStart=x0vncserver -display :0 -rfbauth <span class="variable">$XDG_CONFIG_HOME</span>/tigervnc/passwd</span><br><span class="line">Restart=on-failure</span><br><span class="line">RestartSec=500ms</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure><blockquote><p>例为lightdm,可以查看<code>/var/run/</code>下的dm文件夹修改， 而<code>$XDG_CONFIG_HOME/tigervnc/passwd</code>则是vncpasswd的位置<br>启用x0vncserver</p></blockquote><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> x0vncserver</span><br><span class="line"><span class="built_in">sudo</span> systemctl start x0vncserver</span><br></pre></td></tr></table></figure><ol start="12"><li><h4 id="配置输入法"><a href="#配置输入法" class="headerlink" title="配置输入法"></a>配置输入法</h4></li></ol><p>安装相关软件</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-im</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-chinese-addons</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-mozc</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-pinyin-moegirl</span><br><span class="line"><span class="built_in">sudo</span> pacman -S fcitx5-material-color</span><br></pre></td></tr></table></figure><p>设置环境变量,<code>~/.config/environment.d/im.conf</code></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.config/environment.d/</span><br><span class="line">vim im.conf</span><br></pre></td></tr></table></figure><p>内容为</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># fix fcitx problem</span></span><br><span class="line">GTK_IM_MODULE=fcitx</span><br><span class="line">QT_IM_MODULE=fcitx</span><br><span class="line">XMODIFIERS=@im=fcitx</span><br><span class="line">SDL_IM_MODULE=fcitx</span><br><span class="line">GLFW_IM_MODULE=ibus</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-        <tags>
-            
-            <tag> 教程 </tag>
-            
-            <tag> linux </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>删除在C盘以外的盘符创建的恶心的porgramfiles文件夹</title>
-      <link href="/2024/09/05/%E5%88%A0%E9%99%A4%E5%9C%A8C%E7%9B%98%E4%BB%A5%E5%A4%96%E7%9A%84%E7%9B%98%E7%AC%A6%E5%88%9B%E5%BB%BA%E7%9A%84%E6%81%B6%E5%BF%83%E7%9A%84porgramfiles%E6%96%87%E4%BB%B6%E5%A4%B9/"/>
-      <url>/2024/09/05/%E5%88%A0%E9%99%A4%E5%9C%A8C%E7%9B%98%E4%BB%A5%E5%A4%96%E7%9A%84%E7%9B%98%E7%AC%A6%E5%88%9B%E5%BB%BA%E7%9A%84%E6%81%B6%E5%BF%83%E7%9A%84porgramfiles%E6%96%87%E4%BB%B6%E5%A4%B9/</url>
-      
-        <content type="html"><![CDATA[<h2 id="狗操的微软"><a href="#狗操的微软" class="headerlink" title="狗操的微软"></a>狗操的微软</h2><h3 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h3><h4 id="1-打开注册表编辑器"><a href="#1-打开注册表编辑器" class="headerlink" title="1.打开注册表编辑器"></a>1.打开注册表编辑器</h4><p>定位到<code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\PackageVolumes</code><br>在这里会有多个子项 1、2、3….，看下1应该是指向C盘的，2指向D盘，删除除了1以外的所有子项，然后把PackageVolumes项右侧的 NextVolumeIndex的值改成2。重启以后，我的RamDisk分区没有再自动创建Program Files。</p><h4 id="2-卸载xbox"><a href="#2-卸载xbox" class="headerlink" title="2.卸载xbox"></a>2.卸载xbox</h4><p>系统设置中找到游戏服务，卸载它，再次打开xbox它将被重新安装，此时会再次生成一个programfile的目录，将他删除，之后便不会再生成文件夹（其实还需要重复上一步清除注册表。</p><p>form:<a href="https://bbs.pcbeta.com/viewthread-1978808-2-1.html">来源</a></p>]]></content>
-      
-      
-      
-        <tags>
-            
-            <tag> 微软 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>scoop，oh-my-posh安装及使用</title>
-      <link href="/2024/08/13/scoop%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/"/>
-      <url>/2024/08/13/scoop%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/</url>
-      
-        <content type="html"><![CDATA[<p>安装scoop并配置，安装oh-my-posh并配置</p><h4 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h4><ul><li>   微软商店先下载<code>powershell</code>（自带的太旧了）</li><li>   自备梯子</li></ul><h3 id="安装scoop"><a href="#安装scoop" class="headerlink" title="安装scoop"></a>安装scoop</h3><h4 id="设置powershell脚本执行权限："><a href="#设置powershell脚本执行权限：" class="headerlink" title="设置powershell脚本执行权限："></a>设置<code>powershell</code>脚本执行权限：</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Set-ExecutionPolicy</span> <span class="literal">-ExecutionPolicy</span> RemoteSigned <span class="literal">-Scope</span> CurrentUser</span><br></pre></td></tr></table></figure><blockquote><p>默认安装位置为<code>_%USERPROFILE%\scoop_</code><br>如若自定义安装位置需设置环境变量,无需改变则直接_跳过此步_直接安装</p></blockquote><h5 id="1-设置用户安装路径"><a href="#1-设置用户安装路径" class="headerlink" title="1. 设置用户安装路径"></a>1. 设置用户安装路径</h5>  <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$env:SCOOP</span>=<span class="string">&#x27;D:\Scoop&#x27;</span></span><br><span class="line">[<span class="type">Environment</span>]::SetEnvironmentVariable(<span class="string">&#x27;SCOOP&#x27;</span>, <span class="variable">$env:SCOOP</span>, <span class="string">&#x27;User&#x27;</span>)</span><br></pre></td></tr></table></figure><h5 id="2-使用管理员权限终端powershell设置全局安装路径"><a href="#2-使用管理员权限终端powershell设置全局安装路径" class="headerlink" title="2. 使用管理员权限终端powershell设置全局安装路径"></a>2. 使用管理员权限终端<code>powershell</code>设置全局安装路径</h5>  <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$env:SCOOP_GLOBAL</span>=<span class="string">&#x27;D:\Scoop_Global&#x27;</span></span><br><span class="line">[<span class="type">Environment</span>]::SetEnvironmentVariable(<span class="string">&#x27;SCOOP_GLOBAL&#x27;</span>, <span class="variable">$env:SCOOP_GLOBAL</span>, <span class="string">&#x27;Machine&#x27;</span>)</span><br></pre></td></tr></table></figure><h4 id="打开终端powershell，键入如下，回车安装；"><a href="#打开终端powershell，键入如下，回车安装；" class="headerlink" title="打开终端powershell，键入如下，回车安装；"></a>打开终端<code>powershell</code>，键入如下，回车安装；</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">iwr</span> <span class="literal">-useb</span> get.scoop.sh | <span class="built_in">iex</span></span><br></pre></td></tr></table></figure><h3 id="开始配置"><a href="#开始配置" class="headerlink" title="开始配置"></a>开始配置</h3><h4 id="scoop开始使用需要安装git，scoop安装的git我不会配外置OpenSSH，所以我手动下载安装版git"><a href="#scoop开始使用需要安装git，scoop安装的git我不会配外置OpenSSH，所以我手动下载安装版git" class="headerlink" title="scoop开始使用需要安装git，scoop安装的git我不会配外置OpenSSH，所以我手动下载安装版git"></a><code>scoop</code>开始使用需要安装<code>git</code>，scoop安装的<code>git</code>我不会配外置<code>OpenSSH</code>，所以我手动下载安装版<a href="https://git-scm.com/download/win"><code>git</code></a></h4><blockquote><p>记得选择<code>_Use external OpenSSH_</code></p></blockquote><h4 id="scoop执行更新"><a href="#scoop执行更新" class="headerlink" title="scoop执行更新"></a><code>scoop</code>执行更新</h4>  <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scoop update</span><br></pre></td></tr></table></figure><h4 id="添加官方bucket和第三方bucket"><a href="#添加官方bucket和第三方bucket" class="headerlink" title="添加官方bucket和第三方bucket"></a>添加官方<code>bucket</code>和第三方<code>bucket</code></h4>  <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scoop bucket add extras</span><br><span class="line">scoop bucket add apps https://github.com/kkzzhizhou/scoop<span class="literal">-apps</span></span><br></pre></td></tr></table></figure><blockquote><p>同时官方还提供<code>versions</code>,<code>nirsoft </code>,<code>java</code>这些<code>bucket</code>，可以自行添加</p></blockquote><h4 id="安装软件"><a href="#安装软件" class="headerlink" title="安装软件"></a>安装软件</h4><p>  首先安装<code>scoop-search</code>，可以改善<code>scoop search</code>的搜索体验<br>  安装aria2，提高下载速度<br>  安装adb工具，scrcpy手机投屏工具<br>  安装oh-my-posh，powershell美化工具 等</p>  <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">scoop install main/scoop<span class="literal">-search</span></span><br><span class="line">scoop install main/aria2</span><br><span class="line">scoop install main/adb</span><br><span class="line">scoop install main/scrcpy</span><br><span class="line">scoop install main/<span class="built_in">oh</span><span class="literal">-my-posh</span></span><br><span class="line">scoop install main/<span class="built_in">curl</span></span><br><span class="line">scoop install main/<span class="built_in">wget</span></span><br><span class="line">scoop install main/mihomo</span><br><span class="line">scoop install main/dnslookup</span><br><span class="line">scoop install extras/vscode</span><br><span class="line">scoop install main/ffmpeg</span><br><span class="line">scoop install extras/tsukimi</span><br><span class="line">scoop install main/rclone</span><br><span class="line">scoop install extras/obs<span class="literal">-studio</span></span><br><span class="line">scoop install main/grep</span><br><span class="line">scoop install apps/pixpin</span><br></pre></td></tr></table></figure><blockquote><p><code>scoop</code>常用命令</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&gt;scoop update<span class="comment">#更新bucket数据</span></span><br><span class="line">&gt;scoop update &lt;PACKAGE_NAME&gt;<span class="comment">#更新软件</span></span><br><span class="line">&gt;scoop update *<span class="comment">#更新所有软件</span></span><br><span class="line">&gt;scoop status<span class="comment">#查看软件更新状态</span></span><br><span class="line">&gt;scoop install &lt;PACKAGE_NAME&gt;<span class="comment">#安装软件包</span></span><br><span class="line">&gt;scoop install &lt;BUCKET_NAME&gt;/&lt;PACKAGE_NAME&gt;<span class="comment">#安装特定bucket的软件</span></span><br><span class="line">&gt;scoop uninstall &lt;PACKAGE_NAME&gt;<span class="comment">#卸载软件</span></span><br><span class="line">&gt;scoop cacha show<span class="comment">#查看scoop缓存</span></span><br><span class="line">&gt;scoop cacha <span class="built_in">rm</span> &lt;PACKAGE_NAME&gt;<span class="comment">#移除某个软件的缓存</span></span><br><span class="line">&gt;scoop cacha <span class="built_in">rm</span> *<span class="comment">#清除所有缓存</span></span><br><span class="line">&gt;scoop bucket add &lt;BUCKET_NAME&gt;<span class="comment">#新增bucket（scoop内置bucket才能使用）</span></span><br><span class="line">&gt;scoop bucket add &lt;PACKAGE_NAME&gt; &lt;BUCKET_REPO_URL&gt;<span class="comment">#新增bucket</span></span><br><span class="line">&gt;scoop bucket <span class="built_in">rm</span> &lt;BUCKET_NAME&gt;<span class="comment">#删除bucket</span></span><br><span class="line">&gt;scoop search &lt;PACKAGE_NAME&gt;<span class="comment">#在所有bucket中搜索软件（安装scoop-search后，使用scoop-search取而代之</span></span><br><span class="line">&gt;scoop info &lt;PACKAGE_NAME&gt;<span class="comment">#查看某个软件包的信息</span></span><br><span class="line">&gt;scoop config &#123;OPTIONS&#125;<span class="comment">#设置scoop</span></span><br></pre></td></tr></table></figure></blockquote><h4 id="配置scoop使用aria2下载"><a href="#配置scoop使用aria2下载" class="headerlink" title="配置scoop使用aria2下载"></a>配置<code>scoop</code>使用aria2下载</h4>  <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scoop config aria2<span class="literal">-enabled</span> True</span><br><span class="line">scoop config aria2<span class="operator">-split</span> <span class="number">32</span></span><br><span class="line">scoop config aria2<span class="literal">-max-connection-per-server</span> <span class="number">16</span></span><br><span class="line">scoop config aria2<span class="literal">-min-split-size</span> <span class="number">1</span>M</span><br><span class="line">scoop config aria2<span class="literal">-option</span> <span class="literal">--disable-ipv6</span></span><br></pre></td></tr></table></figure><h4 id="配置oh-my-posh"><a href="#配置oh-my-posh" class="headerlink" title="配置oh-my-posh"></a>配置oh-my-posh</h4><ol><li>下载安装nerd字体，比如<a href="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Meslo.zip"><code>MesloLG Nerd Font</code></a>，并安装<blockquote><p>使用oh-my-posh自带的<code>oh-my-posh font install</code>可能会出现明明已安装字体，并且终端字体设置选项栏也有，但是却提示无字体的状况</p></blockquote></li><li>终端外观设置中选择你安装的Nerd字体</li><li>使用以下指令创建配置文件</li></ol><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">New-Item</span> <span class="literal">-Path</span> <span class="variable">$PROFILE</span> <span class="literal">-Type</span> File <span class="literal">-Force</span></span><br></pre></td></tr></table></figure><p>随后打开配置文件</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notepad <span class="variable">$PROFILE</span></span><br></pre></td></tr></table></figure><p>写入</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">oh</span><span class="literal">-my-posh</span> init pwsh | <span class="built_in">Invoke-Expression</span></span><br></pre></td></tr></table></figure><p>可以使用<code>Get-PoshThemes</code>实时查看可使用的主题，随后按提示写入<code>$PROFILE</code>，上文添加的<code>scoop-search</code>也需要在这里加入到&#96;$PROFIL中去，例如</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">oh-my-posh init pwsh --config &#x27;D:\Scoop\apps\oh-my-posh\current\themes\bubblesextra.omp.json&#x27; | Invoke-Expression</span><br><span class="line">Invoke-Expression (&amp;scoop-search --hook)</span><br></pre></td></tr></table></figure><p>还可以安装更多powershell模块</p><ol start="4"><li>安装<code>PSReadLine</code>和 <code>PowerShellGet</code></li></ol><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Install-PackageProvider</span> <span class="literal">-Name</span> NuGet <span class="literal">-Force</span></span><br></pre></td></tr></table></figure><p>安装或更新<code>PowerShellGet</code></p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Install-Module</span> <span class="literal">-Name</span> PowerShellGet <span class="literal">-Force</span></span><br><span class="line"><span class="built_in">Update-Module</span> <span class="literal">-Name</span> PowerShellGet</span><br></pre></td></tr></table></figure><p>安装<code>PSReadLine</code></p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Install-Module</span> <span class="literal">-Name</span> PSReadLine <span class="literal">-AllowPrerelease</span></span><br></pre></td></tr></table></figure><p>打开powershell配置文件</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notepad <span class="variable">$PROFILE</span></span><br></pre></td></tr></table></figure><p>添加配置，更多配置请<a href="https://github.com/PowerShell/PSReadLine/tree/master">参见</a></p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Import-Module PSReadLine</span><br><span class="line">Set-PSReadLineOption -PredictionSource History # 设置预测文本来源为历史记录</span><br><span class="line">Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete# 设置 Tab 键补全</span><br><span class="line">Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward# 设置向下键为前向搜索历史纪录</span><br><span class="line">Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward# 设置向上键为后向搜索历史记录</span><br><span class="line">Set-PSReadLineKeyHandler -Key &quot;Ctrl+z&quot; -Function Undo# 设置 Ctrl+z 为撤销</span><br><span class="line">Set-PSReadLineKeyHandler -Key &quot;Ctrl+d&quot; -Function MenuComplete# 设置 Ctrl+d 为菜单补全和 Intellisense</span><br></pre></td></tr></table></figure><p>安装终端图标</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Install-Module</span> <span class="literal">-Name</span> Terminal<span class="literal">-Icons</span> <span class="literal">-Repository</span> PSGallery</span><br></pre></td></tr></table></figure><p>打开powershell配置文件</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notepad <span class="variable">$PROFILE</span></span><br></pre></td></tr></table></figure><p>导入终端字体</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Import-Module -Name Terminal-Icons</span><br></pre></td></tr></table></figure><p>使用以下命令验证是否生效</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Path</span> . <span class="literal">-Force</span></span><br></pre></td></tr></table></figure><p>最终<code>Microsoft.PowerShell_profile.ps1</code>如下：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">oh-my-posh init pwsh --config &#x27;D:\Scoop\apps\oh-my-posh\current\themes\bubblesextra.omp.json&#x27; | Invoke-Expression</span><br><span class="line">Import-Module PSReadLine</span><br><span class="line">Import-Module posh-git</span><br><span class="line">Import-Module -Name Terminal-Icons</span><br><span class="line">Set-PSReadLineOption -PredictionSource History</span><br><span class="line">Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete</span><br><span class="line">Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward</span><br><span class="line">Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward</span><br><span class="line">Set-PSReadLineKeyHandler -Key &quot;Ctrl+z&quot; -Function Undo</span><br><span class="line">Set-PSReadLineKeyHandler -Key &quot;Ctrl+d&quot; -Function MenuComplete</span><br><span class="line">Invoke-Expression (&amp;scoop-search --hook)</span><br></pre></td></tr></table></figure><p>本文资料参考：<br><a href="https://zhuanlan.zhihu.com/p/489898732">https://zhuanlan.zhihu.com/p/489898732</a><br><a href="https://ohmyposh.dev/docs/installation/windows">https://ohmyposh.dev/docs/installation/windows</a><br><a href="https://drrany.github.io/wt/">https://drrany.github.io/wt/</a><br><a href="https://blog.antosubash.com/posts/setting-up-powershell-with-oh-my-posh-v3">https://blog.antosubash.com/posts/setting-up-powershell-with-oh-my-posh-v3</a><br><a href="https://github.com/PowerShell/PSReadLine/tree/master">https://github.com/PowerShell/PSReadLine/tree/master</a></p>]]></content>
-      
-      
-      
-        <tags>
-            
-            <tag> 教程 </tag>
-            
-            <tag> 微软 </tag>
-            
-            <tag> win </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>使用ssh密钥完成github commit的认证</title>
-      <link href="/2024/07/26/%E4%BD%BF%E7%94%A8ssh%E5%AF%86%E9%92%A5%E5%AE%8C%E6%88%90github-commit%E7%9A%84%E8%AE%A4%E8%AF%81/"/>
-      <url>/2024/07/26/%E4%BD%BF%E7%94%A8ssh%E5%AF%86%E9%92%A5%E5%AE%8C%E6%88%90github-commit%E7%9A%84%E8%AE%A4%E8%AF%81/</url>
-      
-        <content type="html"><![CDATA[<p>开源项目的维护者如何确保项目的代码没有被黑客入侵？通过使用 SSH 对代码进行签名。方法如下。</p><h4 id="事前准备"><a href="#事前准备" class="headerlink" title="事前准备"></a>事前准备</h4><h5 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h5><p>从ubuntu软件仓库安装：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install git -y </span><br></pre></td></tr></table></figure><p>亦或是：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> add-apt-repository ppa:git-core/ppa</span><br><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; apt install git</span><br></pre></td></tr></table></figure><blockquote><p>其他系统可以从<a href="https://git-scm.com/downloads">git官网</a>安装</p></blockquote><h5 id="创建ssh密钥"><a href="#创建ssh密钥" class="headerlink" title="创建ssh密钥"></a>创建ssh密钥</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen</span><br></pre></td></tr></table></figure><p>生成的密钥将保存在<code>~/.ssh</code>内</p><h5 id="前往或创建一个本地仓库"><a href="#前往或创建一个本地仓库" class="headerlink" title="前往或创建一个本地仓库"></a>前往或创建一个本地仓库</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p project &amp;&amp; <span class="built_in">cd</span> project</span><br><span class="line">git init</span><br></pre></td></tr></table></figure><h3 id="开始配置git"><a href="#开始配置git" class="headerlink" title="开始配置git"></a>开始配置git</h3><h4 id="配置基础信息"><a href="#配置基础信息" class="headerlink" title="配置基础信息"></a>配置基础信息</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">&quot;username&quot;</span></span><br><span class="line">git config --global user.email <span class="string">&quot;email&quot;</span></span><br></pre></td></tr></table></figure><h4 id="启用gpg签名"><a href="#启用gpg签名" class="headerlink" title="启用gpg签名"></a>启用gpg签名</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global commit.gpgsign <span class="literal">true</span></span><br><span class="line">git config --global gpg.format ssh</span><br></pre></td></tr></table></figure><h4 id="填充ssh密钥"><a href="#填充ssh密钥" class="headerlink" title="填充ssh密钥"></a>填充ssh密钥</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-add -L</span><br></pre></td></tr></table></figure><blockquote><p>  如果发生错误，请使用如下命令：<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(ssh-agent)</span>&quot;</span></span><br></pre></td></tr></table></figure><br>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval $(ssh-agent -c)</span><br></pre></td></tr></table></figure><br>然后输出以下内容:</p></blockquote><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCUlMZBvT363Qpg1PM9LzJHwP/ijaPD+0O7l24TchGoqVItu9N6PsnXigVT21VTNemltSfChS6A2qDPMsXKbeiK7It9tMcTDyeBJd2e9rdlzQ05cHQ65jerVIe9pyc/asbX0jtlm0+VcB0fim3gVHlVcR8a6DWrqijU5YXYt3jUzdleHv9XmRJANTRAOpPICTnkO4G9HyNgJeI9M2baFgSwiNohVFHG8KJI1rXM64ryr7Psgr/5DihYSbFfTinI731ZpA3qogIaUlyKDAP7t8Xt7ntSeIzsSfd8A8jiGeYdme+MyUBo/2ENb0UmKYI695Cf6Ua+DGR39j8kt2jGw3rgkkA3L9i2+v+6aHeMzzdgR1FFIsXHs3pfDO05+u1CUgclujamsJdreEbuEwLFHQGQ60m3it7J0T/JGRUcgvQeIukslCyFzz2Rj3j0aSsyVTeVTj7f3rZyWZJlSTVyFv5uMpfm62YzA5hPCPrMJg7XHpUbP4VkWkeTfAalTTtYz34= jack@docker1</span><br></pre></td></tr></table></figure><p>如下命令设置签名密钥：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.signingkey <span class="string">&quot;KEY&quot;</span></span><br><span class="line">git commit --allow-empty --message=<span class="string">&quot;Did SSH signing work?&quot;</span></span><br></pre></td></tr></table></figure><h4 id="配置-SignersFile"><a href="#配置-SignersFile" class="headerlink" title="配置 SignersFile"></a>配置 SignersFile</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers</span><br><span class="line"><span class="built_in">touch</span> ~/.ssh/allowed_signers</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;EMAIL ssh-rsa KEY&quot;</span> &amp;gt; ~/.ssh/allowed_signers</span><br></pre></td></tr></table></figure><h4 id="查看效果"><a href="#查看效果" class="headerlink" title="查看效果"></a>查看效果</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git show --show-signature</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-        <tags>
-            
-            <tag> git </tag>
-            
-            <tag> ssh </tag>
-            
-            <tag> 教程 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Hello World</title>
-      <link href="/2024/07/21/hello-world/"/>
-      <url>/2024/07/21/hello-world/</url>
-      
-        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
+
+配置防火墙还记得前面我们新建的防火墙区域吗，我管他叫wg，进入网络-&gt;防火墙，选择通行规则选项卡，左下角添加新规则，
+
+放行wireguard流量：名称wg-access，协议选择udp，源区域选择wan，目标区域选择输入，目标端口选择前面设置的51820，操作接受。
+
+放行DNS请求：名称叫做wg-DNS，协议选择udp，源区域选择wg，目标区域选择输入，目标端口选择53，操作选接受，这条规则是为了正确解析内网其他设备的dns。
+
+放行路由器后台：名称叫做wg-webui，协议选择tcp和udp，源区域选择wg，目标区域选择此设备，目标端口选择80``443，这条规则是为了从wireguard接口访问路由器后台。
+
+
+选择常规设置选项卡，在我们新建的区域点击编辑，涵盖的网络选择wireguard接口名称wg0，入站，出站，区域内转发分别选择拒绝``接受``拒绝，打开ip动态伪装``TCP MSS钳制，允许转发的目标区域选择lan``wan区域。
+应用并保存所有设置。
+
+    [{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625b33ed9d7.png","alt":"","title":""},{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625b5b9bea8.png","alt":"","title":""}]
   
+
+客户端使用wireguard打开手机客户端，刚刚已经导入了wireguard隧道，直接打开，wireguard客户端将会新建一个vpn连接，看到接收发送数据有变化，则连接成功。此时前往路由器后台，状态-&gt;wireguard，也会看到有设备握手成功。
+同一个对端不能让不同的设备同时使用！
+
+
+iOS使用loon客户端新建一个本地节点，填入我们的服务端wireguard配置，或者直接扫码导入。为了和其他代理同时使用，我们需要新建一个策略组HomeAuto，类型选择ssid，默认和蜂巢数据都选择新建的wireguard节点，底下添加你的ssid，策略选择direct。这样在其他网络就是通过wg访问内网，在内网则直接访问。
+在规则里新建一条规则，类型选择ip-cidr，内容选择你的内网网段10.0.0.1/8，策略选择我们新建的HomeAuto策略组。
+
+    [{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625c7098571.png","alt":"","title":""},{"url":"https://cdn-cos.2254134.xyz/2026/01/10/69625c6f6f6c9.png","alt":"","title":""}]
+  ]]></content>
+      <tags>
+        <tag>openwrt</tag>
+        <tag>loon</tag>
+        <tag>代理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>scoop，starship安装及使用</title>
+    <url>/2025/11/15/scoop%EF%BC%8Cstarship%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[
+前言scoop是  windows平台的类似 winget的包管理器。它是你可以轻松的从命令行安装软件，不需要权限弹窗，自动添加PATH，自动安装依赖。它将所有软件安装到指定目录，避免你的空间杂乱，它可以轻松构建自己的软件包。
+安装powershell因为自带的powershell版本太低，我们从 Microsoft store下载安装powershell，随后打开终端，键入 host
+blog on  master [!?] via  v24.0.2❯ hostName             : ConsoleHostVersion          : 7.5.4InstanceId       : 8d3ca51e-b48a-4465-b6f3-f95d86c8f323UI               : System.Management.Automation.Internal.Host.InternalHostUserInterfaceCurrentCulture   : zh-CNCurrentUICulture : zh-CNPrivateData      : Microsoft.PowerShell.ConsoleHost+ConsoleColorProxyDebuggerEnabled  : TrueIsRunspacePushed : FalseRunspace         : System.Management.Automation.Runspaces.LocalRunspace
+Version &gt; 5.1即可。
+安装scoop授予 powershell脚本执行权限Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+设置安装路径我将安装路径设置为 D:\Scoop
+$env:SCOOP=&#x27;D:\Scoop&#x27;[Environment]::SetEnvironmentVariable(&#x27;SCOOP&#x27;, $env:SCOOP, &#x27;User&#x27;)
+
+设置管理员全局安装路径
+$env:SCOOP_GLOBAL=&#x27;D:\Scoop_Global&#x27;[Environment]::SetEnvironmentVariable(&#x27;SCOOP_GLOBAL&#x27;, $env:SCOOP_GLOBAL, &#x27;Machine&#x27;)
+
+安装scoop使用网络安装脚本
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+
+scoop的配置安装git因为要使用win自带的ssh-agent，所以我选择安装版 git
+注意安装时，选择 Use &lt;mark class=&quot;hl-label pink&quot;&gt;external&lt;/mark&gt; OpenSSH
+
+
+执行更新scoop update
+
+添加官方和第三方 bucketscoop bucket add extrasscoop bucket add javascoop bucket add apps https://github.com/kkzzhizhou/scoop-apps
+
+同时官方还提供versions,nirsoft这些bucket，可以自行添加
+
+
+配置aria2多线程下载scoop install main/aria2scoop config aria2-enabled Truescoop config aria2-split 32scoop config aria2-max-connection-per-server 16scoop config aria2-min-split-size 1Mscoop config aria2-option --disable-ipv6
+
+配置其他必要软件scoop install main/scoop-searchscoop install main/adbscoop install main/scrcpyscoop install main/7zipscoop install main/mihomoscoop install main/winswscoop install java/openjdkscoop install main/curlscoop install main/wgetscoop install main/mihomoscoop install main/dnslookupscoop install extras/vscodescoop install main/ffmpegscoop install main/rclonescoop install extras/obs-studioscoop install main/grepscoop install apps/pixpinscoop install extras/sublime-textscoop install extras/sublime-mergescoop install main/starshipscoop install main/fdscoop install main/fzfscoop install extras/psfzfscoop install main/mpv
+
+scoop-search是scoop搜索插件，用来代替速度缓慢的scoop search
+使用记事本打开配置文件
+notepad $PROFILE
+
+如果提示没有这个文件就运行以下代码生成
+New-Item -Path $PROFILE -Type File -Force
+
+将以下内容添加到您PowerShell配置文件的末尾
+Invoke-Expression (&amp;scoop-search --hook)
+
+配置powershell模块安装 powershell模块Install-PackageProvider -Name NuGet -ForceInstall-Module -Name PowerShellGet -ForceUpdate-Module -Name PowerShellGetInstall-Module -Name PSReadLine -AllowPrereleaseInstall-Module -Name Terminal-Icons -Repository PSGalleryInstall-Module -Name z -ForceInstall-Module -Name posh-git -ForceInstall-PSResource -Name NerdFontsImport-Module -Name NerdFonts
+
+编辑配置文件Import-Module PSReadLineImport-Module posh-gitImport-Module -Name Terminal-IconsImport-Module PSFzfSet-PsFzfOption -PSReadlineChordProvider &#x27;Ctrl+t&#x27; -PSReadlineChordReverseHistory &#x27;Ctrl+r&#x27;Set-PsFzfOption -AltCCommand $commandOverrideSet-PSReadLineKeyHandler -Key Tab -ScriptBlock &#123; Invoke-FzfTabCompletion &#125;Set-PsFzfOption -TabExpansionSet-PsFzfOption -TabCompletionPreviewWindow &#x27;right|down|hidden&#x27;Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackwardSet-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForwardSet-PSReadLineOption -PredictionSource HistorySet-PSReadLineKeyHandler -Key &quot;Ctrl+z&quot; -Function UndoSet-PSReadLineOption -EditMode EmacsSet-PSReadLineOption -BellStyle NoneSet-PSReadLineKeyHandler -Chord &#x27;Ctrl+d&#x27; -Function DeleteCharSet-Alias touch niSet-Alias -Name vim -Value nvimfunction which ($command) &#123;  Get-Command -Name $command -ErrorAction SilentlyContinue |    Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue&#125;
+
+配置starship安装 nerd-font字体下载安装nerd字体，比如MesloLG Nerd Font
+在终端配置中选择 MesloLG Nerd Font
+编辑配置文件编辑配置文件以shell启动时加载
+Invoke-Expression (&amp;starship init powershell)
+
+为 Starship 创建配置文件 ~&#x2F;.config&#x2F;starship.toml。
+md &quot;$home\.config&quot; -Force | Out-Null; Set-Content &quot;$home\.config\starship.toml&quot; &quot;&quot;
+
+使用nerd-font配置
+starship preset nerd-font-symbols -o ~/.config/starship.toml
+更多配置查看官方配置
+
+
+最终的 Microsoft.PowerShell_profile.ps1如下：
+Import-Module PSReadLineImport-Module posh-gitImport-Module -Name Terminal-IconsImport-Module PSFzfSet-PsFzfOption -PSReadlineChordProvider &#x27;Ctrl+t&#x27; -PSReadlineChordReverseHistory &#x27;Ctrl+r&#x27;Set-PsFzfOption -AltCCommand $commandOverrideSet-PSReadLineKeyHandler -Key Tab -ScriptBlock &#123; Invoke-FzfTabCompletion &#125;Set-PsFzfOption -TabExpansionSet-PsFzfOption -TabCompletionPreviewWindow &#x27;right|down|hidden&#x27;Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackwardSet-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForwardSet-PSReadLineOption -PredictionSource HistorySet-PSReadLineKeyHandler -Key &quot;Ctrl+z&quot; -Function UndoSet-PSReadLineOption -EditMode EmacsSet-PSReadLineOption -BellStyle NoneSet-PSReadLineKeyHandler -Chord &#x27;Ctrl+d&#x27; -Function DeleteCharInvoke-Expression (&amp;scoop-search --hook)Invoke-Expression (&amp;starship init powershell)Set-Alias touch niSet-Alias -Name vim -Value nvimfunction which ($command) &#123;  Get-Command -Name $command -ErrorAction SilentlyContinue |    Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue&#125;
+
+如果在git bash或者是Powershell中的rclone输出存在中文乱码，
+rclone ls exhentai://erohon | sls &#x27;studio&#x27;384112914 (鍚屼汉瑾? [STUDIO銇点亗銈?(鐞寸京寮撲粙)] 銈ゃ偔鍦扮崉銉儠銉伀婧躲亼銈嬪か鍗樿韩璧翠换浜哄 (銈儶銈搞儕銉? (闄版瘺銇傘倞).zip382065172 (鍚屼汉瑾? [STUDIO銇点亗銈?(鐞寸京寮撲粙)] 銈ゃ偔鍦扮崉銉儠銉伀婧躲亼銈嬪か鍗樿韩璧翠换浜哄 (銈儶銈搞儕銉? (闄版瘺銇仐).zip314412951 [STUDIO銇点亗銈?(銇伓銈嶃仯銇?] 椋姱銉堛儵銉欍儵銉笺偤 搴冨扯闆嗗洠銉偆銉楁梾琛岀法 [涓浗缈昏ǔ] [DL鐗圿.zip150833720 [STUDIO銇点亗銈?(鏉ラ垗)] 鍦板厓銇儚銉″弸銆傘€屽厛杓┿伄浜哄S銆?[涓浗缈昏ǔ] [DL鐗圿.zip 67965979 [STUDIO銇点亗銈?(鏉ラ垗)] 鍦板厓銇儚銉″弸銆傘€屽悓绱氱敓銇湅璀峰斧K銆?[涓浗缈昏ǔ] [DL鐗圿.zip 57062113 [STUDIO銇点亗銈?(鏉ラ垗)] 鍦板厓銇儚銉″弸銆傘€屽コ瀛愭牎鐢烳銆?[涓浗缈昏ǔ] [DL鐗圿.zip 89590438 [STUDIO銇点亗銈?(鏉ラ垗)] 鍦板厓銇儚銉″弸銆傘€屽緦杓┿伄淇濊偛澹玁銆?[涓浗缈昏ǔ] [DL鐗圿.zip 77933686 [STUDIO銇点亗銈?(鏉ラ垗)] 鍦板厓銇儚銉″弸銆傘€屾繁澶溿伄銈炽兂銉撱儖搴楀摗A銆?[涓浗缈昏ǔ] [DL鐗圿.zip 89160419 [STUDIO銇点亗銈?(鏉ラ垗)] 鍦板厓銇儚銉″弸銆傘€岀京鐞嗐伄濡筊銆?[涓浗缈昏ǔ] [DL鐗圿.zip103449525 [STUDIO銇点亗銈?(鏉ラ垗)] 鎬掋倝銇亜銇ф槦宸濄仌銈?1~2[涓浗缈昏ǔ][鐤忕⒓].zip166805374 [STUDIO銇点亗銈?(鏉ラ垗)] 琛屻亶閬呫倢182姝炽仭銈囥倣銈ㄣ儷銉曟垿绶?[涓浗缈昏ǔ] [DL鐗圿.zip184314306 [STUDIO銇点亗銈?(鏉ラ垗)] 闄镐笂閮ㄩ儴闀枫仺鍓儴闀枫伅淇恒伄鐢熴偑銉娿儧锛侊紒锛?[涓浗缈昏ǔ] [DL鐗圿.zip339026140 [STUDIO銇点亗銈?(鏉ラ垗)] 闄镐笂閮ㄩ儴闀枫仺鍓儴闀枫伅淇恒伄鐢熴偑銉娿儧锛侊紒锛?槎村绶?[涓浗缈昏ǔ] [DL鐗圿.zip260444000 [STUDIO銇点亗銈?(鏉ラ垗)] 椋姱銉堛儵銉欍儵銉笺偤 鍗氬闆嗗洠銉棌銉楁梾琛?銉曘儷銈儵銉肩増 [涓浗缈昏ǔ] [DL鐗圿.zip429110438 [STUDIO銇点亗銈?(鏉ラ垗)] 椋姱銉堛儵銉欍儵銉笺偤 娌栫竸闆嗗洠銉偆銉楁笀 銉忋兗銉儬銇层仺銈婃梾绶?[涓浗缈昏ǔ] [DL鐗圿.zip151339670 [STUDIO銇点亗銈?(鏉ラ垗)] 椋姱銉堛儵銉欍儵銉笺偤 楂樼煡浜哄绲堕爞绶?[涓浗缈昏ǔ] [DL鐗圿.zip291974136 [STUDIO銇点亗銈?(鏉ラ垗)] 椋姱銉堛儵銉欍儵銉笺偤楂樼煡闆嗗洠銉偆銉楁梾琛?[涓浗缈昏ǔ] [DL鐗圿.zip474515295 [STUDIO銇点亗銈揮 椋姱銉堛儵銉欍儵銉笺偤澶ч槳闆嗗洠銉偆銉楃法 [涓浗缈昏ǔ] [DL鐗圿.zip 26198061 [銇犮伀銇俱倠studio (銇犮伀銇俱倠)] C106銇娿伨銇戞湰 (銉栥儷銉笺偄銉笺偒銈ゃ儢) [涓浗缈昏ǔ] [DL鐗圿 [鍐湀鍗佸涓汉婕㈠寲].zip
+则在PROFILE中加入,
+# 打开配置文件（第一次没有会自动创建）notepad $PROFILE# 加入下面三行（没有就新建文件保存）[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8[Console]::InputEncoding = [Text.UTF8Encoding]::UTF8$env:LANG = &quot;zh_CN.UTF-8&quot;
+
+
+则Microsoft.PowerShell_profile.ps1如下：
+[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8[Console]::InputEncoding = [Text.UTF8Encoding]::UTF8$env:LANG = &quot;zh_CN.UTF-8&quot;Import-Module PSReadLineImport-Module posh-gitImport-Module -Name Terminal-IconsImport-Module PSFzfSet-PsFzfOption -PSReadlineChordProvider &#x27;Ctrl+t&#x27; -PSReadlineChordReverseHistory &#x27;Ctrl+r&#x27;Set-PsFzfOption -AltCCommand $commandOverrideSet-PSReadLineKeyHandler -Key Tab -ScriptBlock &#123; Invoke-FzfTabCompletion &#125;Set-PsFzfOption -TabExpansionSet-PsFzfOption -TabCompletionPreviewWindow &#x27;right|down|hidden&#x27;Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackwardSet-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForwardSet-PSReadLineOption -PredictionSource HistorySet-PSReadLineKeyHandler -Key &quot;Ctrl+z&quot; -Function UndoSet-PSReadLineOption -EditMode EmacsSet-PSReadLineOption -BellStyle NoneSet-PSReadLineKeyHandler -Chord &#x27;Ctrl+d&#x27; -Function DeleteCharInvoke-Expression (&amp;scoop-search --hook)Invoke-Expression (&amp;starship init powershell)Set-Alias touch niSet-Alias -Name vim -Value nvimfunction which ($command) &#123;  Get-Command -Name $command -ErrorAction SilentlyContinue |    Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue&#125;
+
+
+
+
+        
+          2025
+
+        
+      
+        
+          12-22
+
+        
+        新增psfzf及z的配置
+
+      
+        
+          11-26
+
+        
+        更新中文乱码的问题
+
+      
+        
+          11-15
+
+        
+        第一次发布
+
+      ]]></content>
+      <tags>
+        <tag>win</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>xiaomi mix2s救砖记录</title>
+    <url>/2026/03/01/xiaomi-mix2s%E6%95%91%E7%A0%96%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[事前准备
+miflash
+小米官方线刷包
+搞机工具箱
+
+软件安装和驱动准备解压miflash文件夹，虽然以管理员身份运行``\miflash\fixusb3.bat来修复使用USB3.0接口导致fastboot的闪退（用usb2.0就不需要了）
+也可以通过搞机工具箱来安装这个驱动
+
+
+刷机长按手机’电源键’+’音量-‘进入fastboot，将手机连接到电脑，打开miflash，点击加载设备即可在设备列表查看到你的设备。
+有下载选择全部删除，如果选择全部删除并锁定则会在刷机完成后重新锁定BL。
+如果选择全部删除并锁定的话，刷机完成后会提示error:not catch checkpoint，这是正常的情况，不想看到的话，可以在顶部的confifuration清空checkpoint内容
+
+
+
+解压线刷包，选择中选中线刷包中image的上一层文件夹，随后点击刷机能直接刷机。
+随后等待即可，完成会自动重启。
+]]></content>
+      <tags>
+        <tag>刷机</tag>
+        <tag>安卓</tag>
+        <tag>救砖</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>不常用但是一旦用上就很有用的命令</title>
+    <url>/2026/08/11/%E4%B8%8D%E5%B8%B8%E7%94%A8%E4%BD%86%E6%98%AF%E4%B8%80%E6%97%A6%E7%94%A8%E4%B8%8A%E5%B0%B1%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[命令复习笔记
+说明：按功能分类整理，命令来自三次 shell 命令行会话。会话一：fd&#x2F;7z&#x2F;awk&#x2F;tar 批量处理与管道传参；会话二：zellij、用户组、fish&#x2F;tide、显示解码、内核、nvim；会话三：磁盘占用排查。
+
+
+一、Shell 基础与脚本1. 基础语法
+;：无条件执行下一条；&amp;&amp;：前一条成功才执行。
+|：管道，前一个命令的 stdout 喂给后一个命令的 stdin。管道传的是数据流，不是文件名。
+&lt;（单箭头）：文件内容重定向进 stdin；&lt;&lt;（双箭头 heredoc）：多行文本到结束符。
+&quot;&quot; 内 $变量、$(...) 会被解析；&#39;&#39; 内原样保留。
+
+2. sh -c 传参（重点）sh -c &#39;脚本&#39; 参0 参1 参2... —— 脚本字符串后的参数依次进 $0、$1、$2…
+
+$0 按惯例放”程序名”，占位用，可写 sh；
+真实参数从 $1 开始（和普通脚本一致）。
+
+# 风格1：$0 占位，数据在 $1sh -c &#x27;7z l -ba &quot;$1&quot;&#x27; sh 文件# 风格2：不用占位，数据直接放 $0，脚本用 $0sh -c &#x27;7z l -ba &quot;$0&quot;&#x27; 文件
+
+sh -c &#39;脚本&#39; A B C 等价于一个名为 A 的脚本带参数 B C，只是省了临时文件。
+
+在 fd -x 里想用管道，把整段包进 sh -c &#39;...&#39; 即可；引号太多就写成独立脚本文件再调用。
+
+3. 后台并行（for + &amp; + wait）for d in /home/*/; do du -sx &quot;$d&quot; 2&gt;/dev/null &amp; done; wait
+
+
+&amp;：把每条命令丢到后台并行跑；
+wait：等所有后台任务结束；
+2&gt;/dev/null：丢权限报错，只看得到结果；
+注意 for 循环体里的变量要带引号 &quot;$d&quot;（防路径带空格）。
+
+
+二、文件查找与批处理1. fd 批量执行
+
+
+命令
+含义
+
+
+
+fd . .
+模式是第一个 .（正则匹配所有），目录是第二个 .（当前目录，可省略）
+
+
+fd -x CMD {}
+对每个搜索结果并行执行 CMD（小写 x）
+
+
+fd -X CMD {}
+把所有结果一次性作为参数执行 CMD（大写 X，仅一次）
+
+
+-t f &#x2F; -e tar
+只匹配文件 &#x2F; 扩展名是 .tar
+
+
+--exclude file
+排除某个文件（防自己扫到自己）
+
+
+
+fd 没有内置”逐条顺序执行”模式。要顺序执行用 while read 循环：while read -r f; do 7z x -y &quot;$f&quot;; done &lt; &lt;(fd . -t f -e tar)或 find . -name &#39;*.tar&#39; -exec 7z x {} \;
+
+2. find 查找find / -xdev -type f -size +500M -exec ls -lh &#123;&#125; \;
+
+
+
+
+参数
+含义
+
+
+
+/
+起点目录（可换 &#x2F;home 等）
+
+
+-xdev
+不跨文件系统（同 du 的 -x），避免扫进其他挂载盘
+
+
+-size +500M
+大于 500M 的文件（-500M 小于，500M 精确）
+
+
+-exec ls -lh {} \;
+对每个结果执行 ls 看大小；{} 是结果占位符，\; 结尾
+
+
+2&gt;/dev/null
+丢掉无权限目录的报错
+
+
+
+比 du 快得多：du 要遍历所有文件统计大小，find 直接按 size 元数据筛。
+
+3. tar 文件传输（通过 adb）# 推送（电脑 → 手机）：tar 把内容+名字+权限打成一条字节流，绕开 adb 的文件名编码问题tar c . | adb shell &#x27;mkdir -p /sdcard/backup &amp;&amp; tar x -C /sdcard/backup&#x27;# 拉取（手机 → 电脑）：用 exec-out 避免 PTY 把二进制流改坏adb exec-out tar c -C /sdcard/backup . | tar x# 压缩版本：两边加 ztar cz . | adb shell &#x27;tar xz -C /sdcard/backup&#x27;
+
+
+cat 只能传单个文件内容（丢名字）；tar 保留名字+权限+内容；adb push 的文件名走了独立编码通道最容易坏。
+
+
+三、文本处理与统计1. awk 取列awk &#x27;&#123;print $4&#125;&#x27;            # 第 4 列；$NF 最后一列，$0 整行awk &#x27;&#123;print $4, $NF&#125;&#x27;       # 多列，空格分隔awk -F&#x27;= &#x27; &#x27;/^Path =/&#123;print $2&#125;&#x27;   # 自定义分隔符 + 只处理匹配行
+
+2. wc 计数wc -l file.txt        # 输出 &quot;13 file.txt&quot;（带文件名）wc -l &lt; file.txt      # 只输出数字（从 stdin 读，wc 不知道文件名）cat file.txt | wc -l  # 等价于上面的 &lt; 写法
+
+wc -l &lt; f &gt;&gt; f 追加行数到文件末尾（注意分号：... &gt; f; wc -l &lt; f &gt;&gt; f）。
+3. 7z 列目录 &#x2F; 统计7z l 包.7z          # 表格输出7z l -ba 包.7z      # 无表头，方便脚本处理7z l -slt 包.7z     # 结构化 Key = Value 输出，最可靠
+
+7z l -ba 输出的汇总行（每个包末尾）字段：
+2026-04-23 23:10:28  297246867  291996096  43 files, 1 folders$1日期 $2时间 $3大小 $4压缩   $5=43  $6    $7=1   $8
+
+批量统计所有 .7z 的文件&#x2F;文件夹总数：
+fd . -t f -e 7z -x sh -c &#x27;7z l -ba &quot;$1&quot; 2&gt;/dev/null | grep &quot;files,&quot;&#x27; sh &#123;&#125; | \  awk &#x27;&#123;f+=$5; d+=$7&#125; END&#123;print f&quot; files, &quot;d&quot; folders&quot;&#125;&#x27;
+
+
+四、磁盘与存储1. 磁盘状态查看（df）
+
+
+命令
+含义
+
+
+
+df -h
+看各分区使用率（-h 人类可读）；还显示每个挂载点各自占用，/var、/home 若在同一分区会重复列出
+
+
+df -i
+看 inode 使用率（文件数爆满时用，空间剩很多但报”磁盘满”就是 inode 满了）
+
+
+
+关键认知：/var/log、/var/cache、/home 可能都挂在同一块根分区上，清理时按总占用算，别被单目录的”使用率 78%”误导。
+
+2. 目录大小扫描（du）
+
+
+命令
+含义
+
+
+
+du -sh 目录
+只看该目录总大小（-s 汇总、-h 人类可读）
+
+
+du -sh 目录1 目录2
+一次查多个目录，各自独立输出
+
+
+du -hxd1 /
+看根下第一级各目录大小；d1&#x3D;深度 1，x&#x3D;不跨文件系统（跳过 &#x2F;dev、&#x2F;proc 等挂载点），h&#x3D;人类可读
+
+
+du -hxd1 /home | sort -rh | head -20
+按大小降序取前 20：sort -rh（r&#x3D;反序，h&#x3D;按人类可读单位 1G&gt;900M 正确比较）
+
+
+du -xh --max-depth=2 目录
+看两层的更细分布（深了会很慢）
+
+
+
+坑：du 对文件极多的目录（如 &#x2F;home 下塞满大量小文件）会卡死超时。先 d1 粗扫锁定嫌疑，再逐层深入；不要一上来全盘 du -xhd1 /。
+
+3. 空间清理# pacman 缓存（Arch：/var/cache/pacman/pkg，越装越胖）sudo pacman -Scc# journald 日志（systemd 的 /var/log/journal）sudo journalctl --disk-usage          # 看占多少sudo journalctl --vacuum-size=100M    # 清到只留 100M# 用户缓存（~/.cache 常藏 pip/npm/浏览器缓存）du -sh ~/.cache# Docker 镜像（若装过）sudo du -sh /var/lib/docker
+
+
+五、软件包与系统管理1. pacman 包管理（以内核切换为例）sudo pacman -S linux-zen linux-zen-headers             # 装新内核，自动生成 initramfssudo pacman -R linux-hardened linux-hardened-headers   # 确认能启动后再删旧内核
+
+
+rEFInd 会自动扫描 /boot 识别新内核并配对同名 initramfs，装完重启即可在菜单选。
+但 refind_linux.conf 里默认选项写死了 initrd=\initramfs-linux-hardened.img，auto-detect 可能配错 initrd。保稳做法是显式加条目：
+
+&quot;Arch Linux (linux-zen)&quot; &quot;root=PARTUUID=&lt;你的&gt; zswap.enabled=0 rootflags=subvol=@ rw rootfstype=btrfs initrd=\initramfs-linux-zen.img&quot;
+
+
+切换流程：装新内核 → 重启验证能进 → 再删旧的，留一个保底。
+
+2. 用户与权限sudo usermod -aG 组名 用户名    # -a 追加，必带，否则覆盖原组groups 用户名                   # 查看用户的组newgrp 组名                     # 免重新登录立即生效（当前 shell）
+
+
+多个组逗号分隔：sudo usermod -aG wheel,docker 用户名。
+
+3. 防火墙（ufw）# mihomo 局域网共享sudo ufw allow from 192.168.1.0/24 to any port 7890 proto tcp# mihomo TUN 模式放行虚拟网卡sudo ufw allow in on tun0 to anysudo ufw allow out on tun0 to any
+
+
+六、终端会话管理（zellij）
+
+
+命令
+含义
+
+
+
+zellij
+进入新会话（关掉会问是否销毁）
+
+
+zellij -s 名字
+命名会话
+
+
+zellij attach
+重连最近会话
+
+
+zellij ls
+列出所有会话
+
+
+zellij kill-session 名字
+杀掉指定会话（在外面操作）
+
+
+zellij kill-all-sessions
+杀掉所有会话
+
+
+pkill zellij
+进程僵死时强杀
+
+
+
+常用快捷键：Ctrl+p 切面板、Ctrl+t 切标签、Ctrl+n 新面板、Ctrl+d 关闭面板、Ctrl+s 会话管理界面、Ctrl+g 帮助总览。zellij 和 tmux 一样支持持久会话：关掉窗口后进程还在后台跑，zellij attach 重连。Ghostty 本身则没有内置 detach&#x2F;持久会话，要放后台必须靠 tmux&#x2F;zellij。
+
+
+七、桌面显示与解码MOZ_ENABLE_WAYLAND=1 firefox   # X11 下全屏溢出 → 切 Wayland 渲染sudo pacman -S libavif         # Gwenview 打不开 AVIF 的真正原因
+
+
+坑：kimageformats 装了、kimg_avif.so 插件也在（/usr/lib/qt6/plugins/imageformats/），但打开 AVIF 仍失败 —— 因为该插件依赖的 libavif.so.16 没装（Arch 把它当运行时可选依赖）。用 ldd /usr/lib/qt6/plugins/imageformats/kimg_avif.so 可确认。Dolphin 远程目录（SMB&#x2F;SSH）默认不生成缩略图：Dolphin → 设置 → 通用 → 预览 → 勾选 “Show previews for remote files”。
+
+
+八、Shell 环境配置（fish &#x2F; tide）现象：tide 提示符左边的箭头显示 &lt;（而不是 ❯）。
+原因：这个 tide v6 fork 的逻辑是 fish_key_bindings 等于 fish_default_key_bindings 才显示 ❯，否则走 vi 分支用 ❮。而 fish 4.8 里该变量是空的，于是误判。不是 vi 模式。
+set -U fish_key_bindings fish_default_key_bindings    # 修复（写入 fish_variables 通用变量）set -U tide_character_vi_icon_default &#x27;❯&#x27;             # 或直接改图标
+
+开启 vi 模式（想真的用 vim 风格编辑命令行时）：
+fish_vi_key_bindings                                   # 临时，当前会话# 永久：在 ~/.config/fish/conf.d/ 建个文件（如 vi-mode.fish）写一行 fish_vi_key_bindings
+
+
+vi 模式开启后，普通模式用 h/j/k/l 移动、i 进插入模式、Esc 返回；tide 箭头在普通模式显示 ❮ 是有意的模式提示。
+
+
+九、编辑器（nvim 光标移动）$   行尾       0   行首（硬）^   行首（非空） gg  文首G   文尾       A   跳行尾并进入插入模式42G 跳第 42 行
+
+
+查看快捷键：:map（全部）、:nmap&#x2F;:imap&#x2F;:vmap（按模式）、:verbose map &lt;键&gt;（看来源文件）。
+
+
+十、常见坑与经验命令执行类
+fd -x 并行 + 7z x 的 \r 进度 → 进度行互相覆盖、看不到输出，但文件在解。加 -y -bb1 或改顺序执行。
+重定向目标被自己扫到：&gt;&gt; filelist.txt 在当前目录，fd 会把 filelist.txt 也传给 7z → 加 --exclude 或输出到 &#x2F;tmp。
+非 tty 时输出是块缓冲：被 Ctrl-C 杀掉会丢输出，文件其实已创建。
+
+排查方法论
+先粗后细：df -h 看整体 → du -d1 逐级缩小范围 → 再深挖。别一上来全盘扫。
+du 会卡死的场景：小文件海量（node_modules、.cache 之类），此时改用 find -size 或按文件数定位。
+权限错误直接丢：扫描类命令统一加 2&gt;/dev/null，否则满屏 Permission denied 淹掉结果。
+排查记录要留档：写进 md 文档，记下每步命令、结果、结论，方便下次接着查。
+
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>为vps配置ssh密钥连接</title>
+    <url>/2025/12/16/%E4%B8%BAvps%E9%85%8D%E7%BD%AEssh%E5%AF%86%E9%92%A5%E8%BF%9E%E6%8E%A5/</url>
+    <content><![CDATA[新买来的vps一般都是给root账号使用密码登录，这不仅麻烦而且不太安全，所以还是得使用密钥登录。
+配置用户首先连接上你的vps，给vps新建一个普通账户，这个账户将成为我们大部分时间使用的账户。
+adduser $USERNAME									#之后会有交互式命令usermod -aG sudo									#给管理员权限su - $USERNAME										#切换用户
+
+adduser似乎是高级版本的发行版才有的命令，残念です。没有 adduser就用以下命令吧，效果是一样的。
+useradd -m -s /bin/bash -G sudo $USERNAME			#新建一个名为USERNAME的拥有管理员权限的默认sh为/bin/bash的用户
+
+没有管理员权限？用户能否使用 sudo其实是由 /etc/sudoers控制的，有时候你即使是加入到 sudo组也是没有 sudo权限的。这是因为 /etc/sudoers没有给 sudo组使用 sudo的权限。如下：
+## sudoers file.#### This file MUST be edited with the &#x27;visudo&#x27; command as root.## Failure to use &#x27;visudo&#x27; may result in syntax or file permission errors## that prevent sudo from running.#### See the sudoers man page for the details on how to write a sudoers file.###### Host alias specification#### Groups of machines. These may include host names (optionally with wildcards),## IP addresses, network numbers or netgroups.# Host_Alias    WEBSERVERS = www1, www2, www3#### User alias specification#### Groups of users.  These may consist of user names, uids, Unix groups,## or netgroups.# User_Alias    ADMINS = millert, dowdy, mikef#### Cmnd alias specification#### Groups of commands.  Often used to group related commands together.# Cmnd_Alias    PROCESSES = /usr/bin/nice, /bin/kill, /usr/bin/renice, \#                           /usr/bin/pkill, /usr/bin/top## Cmnd_Alias    REBOOT = /sbin/halt, /sbin/reboot, /sbin/poweroff## Cmnd_Alias    DEBUGGERS = /usr/bin/gdb, /usr/bin/lldb, /usr/bin/strace, \#                           /usr/bin/truss, /usr/bin/bpftrace, \#                           /usr/bin/dtrace, /usr/bin/dtruss## Cmnd_Alias    PKGMAN = /usr/bin/apt, /usr/bin/dpkg, /usr/bin/rpm, \#                        /usr/bin/yum, /usr/bin/dnf,  /usr/bin/zypper, \#                        /usr/bin/pacman#### Defaults specification#### Preserve editor environment variables for visudo.## To preserve these for all commands, remove the &quot;!visudo&quot; qualifier.Defaults!/usr/bin/visudo env_keep += &quot;SUDO_EDITOR EDITOR VISUAL&quot;#### Use a hard-coded PATH instead of the user&#x27;s to find commands.## This also helps prevent poorly written scripts from running## arbitrary commands under sudo.Defaults secure_path=&quot;/usr/local/sbin:/usr/local/bin:/usr/bin&quot;#### You may wish to keep some of the following environment variables## when running commands via sudo.#### Locale settings# Defaults env_keep += &quot;LANG LANGUAGE LINGUAS LC_* _XKB_CHARSET&quot;#### Run X applications through sudo; HOME is used to find the## .Xauthority file.  Note that other programs use HOME to find## configuration files and this may lead to privilege escalation!# Defaults env_keep += &quot;HOME&quot;#### X11 resource path settings# Defaults env_keep += &quot;XAPPLRESDIR XFILESEARCHPATH XUSERFILESEARCHPATH&quot;#### Desktop path settings# Defaults env_keep += &quot;QTDIR KDEDIR&quot;#### Allow sudo-run commands to inherit the callers&#x27; ConsoleKit session# Defaults env_keep += &quot;XDG_SESSION_COOKIE&quot;#### Uncomment to enable special input methods.  Care should be taken as## this may allow users to subvert the command being run via sudo.# Defaults env_keep += &quot;XMODIFIERS GTK_IM_MODULE QT_IM_MODULE QT_IM_SWITCHER&quot;#### Uncomment to disable &quot;use_pty&quot; when running commands as root.## Commands run as non-root users will run in a pseudo-terminal,## not the user&#x27;s own terminal, to prevent command injection.# Defaults&gt;root !use_pty#### Uncomment to run commands in the background by default.## This can be used to prevent sudo from consuming user input while## a non-interactive command runs if &quot;use_pty&quot; or I/O logging are## enabled.  Some commands may not run properly in the background.# Defaults exec_background#### Uncomment to send mail if the user does not enter the correct password.# Defaults mail_badpass#### Uncomment to enable logging of a command&#x27;s output, except for## sudoreplay and reboot.  Use sudoreplay to play back logged sessions.## Sudo will create up to 2,176,782,336 I/O logs before recycling them.## Set maxseq to a smaller number if you don&#x27;t have unlimited disk space.# Defaults log_output# Defaults!/usr/bin/sudoreplay !log_output# Defaults!/usr/local/bin/sudoreplay !log_output# Defaults!REBOOT !log_output# Defaults maxseq = 1000#### Uncomment to disable intercept and log_subcmds for debuggers and## tracers.  Otherwise, anything that uses ptrace(2) will be unable## to run under sudo if intercept_type is set to &quot;trace&quot;.# Defaults!DEBUGGERS !intercept, !log_subcmds#### Uncomment to disable intercept and log_subcmds for package managers.## Some package scripts run a huge number of commands, which is made## slower by these options and also can clutter up the logs.# Defaults!PKGMAN !intercept, !log_subcmds#### Uncomment to disable PAM silent mode.  Otherwise messages by PAM## modules such as pam_faillock will not be printed.# Defaults !pam_silent#### Runas alias specification###### User privilege specification##root ALL=(ALL:ALL) ALL## Uncomment to allow members of group wheel to execute any command# %wheel ALL=(ALL:ALL) ALL## Same thing without a password# %wheel ALL=(ALL:ALL) NOPASSWD: ALL## Uncomment to allow members of group sudo to execute any command# %sudo ALL=(ALL:ALL) ALL## Uncomment to allow any user to run sudo if they know the password## of the user they are running the command as (root by default).# Defaults targetpw  # Ask for the password of the target user# ALL ALL=(ALL:ALL) ALL  # WARNING: only use this together with &#x27;Defaults targetpw&#x27;## Read drop-in files from /etc/sudoers.d@includedir /etc/sudoers.d
+
+以上为 archlinux的默认 sudoers,你可以手动去掉 sudo组的注释。或者采用更推荐的方法：在 /etc/sudoers.d新建文件，内容为
+$USERNAME ALL=(ALL) ALL
+$USERNAME是你的用户名，就像我这样，
+╰─❯ sudo cat /etc/sudoers.d/00_tokisakatokisaka ALL=(ALL) ALL
+
+配置密钥登录
+导入公钥暂且认为你已经有密钥了。
+
+使用ssh-copy-idssh-copy-id $USERNAME@255.255.255.255 -p 1234			#$USERNAME是你的用户名，255.255.255.255是你的vps ，-p 1234为ssh端口，默认端口可以不写
+
+遗憾的是 ssh-copy-id在win上用不了，想用的话只能走些邪门歪道了。
+
+
+复制公钥把你的公钥复制到vps的 ~/.ssh/authorized_keys里，.ssh权限设置 700, authorized_keys 权限设置为600
+
+设置ssh
+
+ssh配置是由 /etc/ssh/sshd_config控制的，你可以打开看看。但是修改还是推荐在 /etc/ssh/sshd_config.d/下新建文件来修改。
+cd /etc/ssh/sshd_config.d/sudo touch ssh.conf 					#一定要是conf结尾sudo vim ssh.conf 
+设置如下
+Port 22Port 1234								#设置ssh的端口PubkeyAuthentication yes				#设置密钥登录#PasswordAuthentication no 				#禁用密码登录 #PermitRootLogin no 					#禁用root账户登录 ，密钥登录成功再回来取消注释吧
+重启ssh使更改生效
+sudo systemctl restart sshd]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用ssh密钥完成github commit的认证</title>
+    <url>/2025/11/11/%E4%BD%BF%E7%94%A8ssh%E5%AF%86%E9%92%A5%E5%AE%8C%E6%88%90github-commit%E7%9A%84%E8%AE%A4%E8%AF%81/</url>
+    <content><![CDATA[开源项目的维护者如何确保项目的代码没有被黑客入侵？通过使用 SSH 对代码进行签名。方法如下。
+
+事前准备display安装git
+sudo add-apt-repository ppa:git-core/ppasudo apt update &amp;&amp; apt install git
+其它系统可以从 git官网 安装
+
+
+windows最好通过scoop下载安装，但是可能会出现不认识ssh客户端的情况，这时候只要
+git config --globle core.sshCommand = \&quot;C:/Windows/System32/OpenSSH/ssh.exe\&quot;
+
+
+创建ssh密钥ssh-keygen
+生成的密钥保存在~/.ssh/内
+
+
+进入git仓库mkdir -p project &amp;&amp; cd projectgit init
+打开或进入一个git仓库，并初始化
+
+
+开始配置git配置基础信息git config --global user.name &quot;username&quot;git config --global user.email &quot;email&quot;
+
+额外配置git config --global gui.encoding &quot;utf-8&quot;git config --global i18n.commitenciding &quot;utf-8&quot;git config --global svn.pathnameencoding &quot;utf-8&quot;git config --global core.quotepath false
+鸣谢:  YuSoLi
+
+
+
+启用gpg签名，并修改gpg认证密钥格式git config --global commit.gpgsign truegit config --global gpg.format ssh
+写入ssh密钥ssh-add ~/.ssh/id_rsa
+如果发生错误请使用如下命令：	eval &quot;$(ssh-agent)&quot;	eval $(ssh-agent -c)如果是win设备，则使用
+Get-Command ssh
+查看所使用的ssh可执行文件位置并启动。
+
+
+列出ssh密钥ssh-add -L
+他大概输出了如下内容：
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCUlMZBvT363Qpg1PM9LzJHwP/ijaPD+0O7l24TchGoqVItu9N6PsnXigVT21VTNemltSfChS6A2qDPMsXKbeiK7It9tMcTDyeBJd2e9rdlzQ05cHQ65jerVIe9pyc/asbX0jtlm0+VcB0fim3gVHlVcR8a6DWrqijU5YXYt3jUzdleHv9XmRJANTRAOpPICTnkO4G9HyNgJeI9M2baFgSwiNohVFHG8KJI1rXM64ryr7Psgr/5DihYSbFfTinI731ZpA3qogIaUlyKDAP7t8Xt7ntSeIzsSfd8A8jiGeYdme+MyUBo/2ENb0UmKYI695Cf6Ua+DGR39j8kt2jGw3rgkkA3L9i2+v+6aHeMzzdgR1FFIsXHs3pfDO05+u1CUgclujamsJdreEbuEwLFHQGQ60m3it7J0T/JGRUcgvQeIukslCyFzz2Rj3j0aSsyVTeVTj7f3rZyWZJlSTVyFv5uMpfm62YzA5hPCPrMJg7XHpUbP4VkWkeTfAalTTtYz34= jack@docker1
+
+设置签名密钥git config --global user.signingkey &quot;KEY&quot;git commit --allow-empty --message=&quot;Did SSH signing work?&quot;
+
+配置SignerFilegit config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signerstouch ~/.ssh/allowed_signersecho &quot;EMAIL ssh-rsa KEY&quot; &amp;gt; ~/.ssh/allowed_signers
+
+最后查看效果git show --show-signature
+
+╰─❯ git show --show-signature错误：cannot run less: 没有那个文件或目录致命错误：unable to execute pager &#x27;less&#x27;
+验证时出现如上错误，原因是less没安装，通过sudo pacman -S less安装即可。
+Git报错 error: cannot spawn more: No such file or directory 
+原因是Git在执行log和diff这类命令，为了结果方便显示，会使用一个分页器，这个分页器默认是使用的less，但我的不知道怎么变成了more，所以才会报more这个指令找不到的错误。只要改成less即可。
+git config --global core.pager &#x27;less&#x27; 
+
+迁移配置如果多设备使用同一套配置，只需要将.gitconfig都知道对应目录，随后将ssh密钥也放入对应的目录并设置权限为600。
+各个设备的配置不是完全一样的，所以还是需要改一改的
+
+
+
+如果提示Good &quot;git&quot; signature for EMAIL with RSA key则说明配置成功啦！
+
+
+鸣谢:  Outsrkem		THENEWSTACK
+
+
+
+]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>删除在C盘以外的盘符创建的恶心的porgramfiles文件夹</title>
+    <url>/2025/11/15/%E5%88%A0%E9%99%A4%E5%9C%A8C%E7%9B%98%E4%BB%A5%E5%A4%96%E7%9A%84%E7%9B%98%E7%AC%A6%E5%88%9B%E5%BB%BA%E7%9A%84%E6%81%B6%E5%BF%83%E7%9A%84porgramfiles%E6%96%87%E4%BB%B6%E5%A4%B9/</url>
+    <content><![CDATA[
+前言自从xbox把下载位置改到其他地方之后，总是在其他磁盘下面看到programfile文件夹，每每看到生厌至极，所以上网一同查找，找来了解决办法。
+打开注册表编辑器快捷方式 +r打开运行窗口，键入 regedit进入注册表编辑器。定位到 HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\PackageVolumes，在这里会有多个子项 1、2、3….，看下1应该是指向C盘的，2指向D盘，删除除了1以外的所有子项，然后把 PackageVolumes项右侧的 NextVolumeIndex的值改成2。重启以后，我的RamDisk分区没有再自动创建Program Files。
+卸载xbox系统设置中找到 游戏服务，卸载它，再次打开xbox它将被重新安装，此时会再次生成一个 programfile的目录，将他删除，之后便不会再生成文件夹。
+如果还有，重复上一步清除注册表
+
+
+
+
+        
+          2025
+
+        
+      
+        
+          11-15
+
+        
+        第一次发布
+
+      ]]></content>
+      <tags>
+        <tag>windows</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>我看过的神级本子</title>
+    <url>/2025/12/19/%E6%88%91%E7%9C%8B%E8%BF%87%E7%9A%84%E7%A5%9E%E7%BA%A7%E6%9C%AC%E5%AD%90/</url>
+    <content><![CDATA[美乳の彼女がいるのに体操部の爆乳が誘ってくる
+    [{"url":"https://cdn.hentag.com/content/cover-img/n7ber20uln10jsdcrgbm609g69ri1top0b14n2o2ae930r77gk00.jpg","alt":"","title":""},{"url":"https://cdn.hentag.com/content/cover-img/irijkkkp0nd24hvvfe0hp5hcc13rgejffdl7hqpc5vf80ok6bgs0.webp","alt":"","title":""},{"url":"https://cdn.hentag.com/content/cover-img/nifn78h488unb0681ke5etl2ejkav0bbla1tlokutipk8t9m3lig.webp","alt":"","title":""}]
   
+
+
+[裏FMO (フミオ)] 美乳の彼女がいるのに体操部の爆乳が誘ってくる [中国翻訳] [DL版]      https://exhentai.org/g/2963975/7295aacf3b/
+[裏FMO (フミオ)] 美乳の彼女がいるのに体操部の爆乳が誘ってくる 2    [中国翻訳] [DL版] https://exhentai.org/g/3070716/a9d11416bd/
+[裏FMO (フミオ)] 美乳の彼女がいるのに体操部の爆乳が誘ってくる3 [中国翻訳] [DL版]     https://exhentai.org/g/3491086/3446767afa/
+
+本栏目创建的动机，一般路人男体操社员男主，在对高规格拉拉队女友告白后竟然真的与其交往，对于从来没获得过他人认可的男主是莫大的惊喜。然而身为高岭之花的体操社社长学姐却在此时对其暗送秋波，这一方面煽动者男主的情欲，另一方面也考验着男女主的感情。
+我的评价是，顶级，女主真的好，纯情的一批，男主也确实渣，但这不怪男主，这个学姐确实太超模了，本身建模就是顶级，在xp上更是稳稳拿捏，甚至会玩噓寝取られ这种玩法，她确实很会，而且她还是处女，确实很超模。
+生徒に住所がバレたんだが終わったかもしれん 1-10
+
+
+[にぎりうさぎ] 生徒に住所がバレたんだが終わったかもしれん 1-10 [中国翻訳]               https://exhentai.org/g/3689936/455bb90943/
+
+这作者是懂玩法的，从一开始眼镜妹勾引，一转撸管游戏，轮流撸10下，多p还带寸止属性，完了第二天，轮流蒙眼撸管口交，最后一边憋着一边回想与女主的过去，最后还是射了。第三次直接上垒，眼镜妹特会装，很有感觉，短发妹则是冷冷的，在和辣妹做的时候还会刻意叫爸爸挑衅。最后眼镜妹公然学校勾引，抽插100下寸止，被其他二人得之后直接开启大乱斗，喝了精力剂。之后猛猛操翻
+]]></content>
+      <tags>
+        <tag>hentai</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>清理win卸载软件后的关联残留</title>
+    <url>/2026/06/02/%E6%B8%85%E7%90%86win%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6%E5%90%8E%E7%9A%84%E5%85%B3%E8%81%94%E6%AE%8B%E7%95%99/</url>
+    <content><![CDATA[网页跳转tg:&#x2F;&#x2F;提示我已卸载的软件，看了就觉得很烦，所以来清理一下。win+r键入regedit打开注册表，定位到计算机\HKEY_CURRENT_USER\Software\RegisteredApplications，可以看到两个已卸载的软件仍然躺在里面，清除就好了。
+]]></content>
+      <tags>
+        <tag>windows</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>配置uv</title>
+    <url>/2025/12/11/%E9%85%8D%E7%BD%AEuv/</url>
+    <content><![CDATA[安装uvwindowsarchlinuxscoop install main/uvsudo pacman -S uv
+
+配置uv缓存位置win端使用scoop安装的，在uv0.11.16版本后会自动配置到环境变量
+Scoop persists data since version 0.11.16. You may need to move data by yourself.Before: &#x27;$env:APPDATA\uv&#x27;, &#x27;$env:LOCALAPPDATA\uv&#x27;After : &#x27;E:\scoop\persist\uv&#x27;❯ uv cache dirE:\scoop\persist\uv\cache~❯ uv python dirE:\scoop\persist\uv\python\versions~❯ uv tool dirE:\scoop\persist\uv\tools\versions
+
+使用 uv cache dir 查看uv缓存位置，
+uv cache dirG:\uv
+使用 uv python dir查看python存放位置,
+uv python dirC:\Users\Tokisaka\AppData\Roaming\uv\python
+使用 uv tool dir查看uv工具存放位置,
+uv tool dirC:\Users\Tokisaka\AppData\Roaming\uv\tools
+
+查看其他设置，
+uv cache prune  # 看里面占了多少空间uv cache clean  # 一键删光（小心）
+
+windowsarchlinux在系统环境变量中分别设置 UV_CACHE_DIR UV_PYTHON_INSTALL_DIR UV_TOOL_DIR可以指定三者位置。修改配置文件# 告诉 uv 用这个目录（所有用户都生效）echo &#x27;cache-dir = &quot;/data/uv-cache&quot;&#x27; &gt; /etc/uv.toml# 或者只改当前用户（推荐大多数人用这个）mkdir -p ~/.config/uvecho &#x27;cache-dir = &quot;/data/uv-cache&quot;&#x27; &gt; ~/.config/uv/uv.toml
+配置临时目录export UV_CACHE_DIR=/data/uv-cache
+设置永久环境变量echo &#x27;export UV_CACHE_DIR=/data/uv-cache&#x27; &gt;&gt; ~/.bashrcsource ~/.bashrc
+
+配置uv下载源环境变量更换临时更换windowsarchlinux$env:UV_INDEX_URL = &quot;https://pypi.tuna.tsinghua.edu.cn/simple&quot;echo $env:UV_INDEX_URL 											#验证export UV_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/echo $UV_INDEX_URL     											#验证
+
+永久更换windowsarchlinux打开「系统属性」→「高级」→「环境变量」，新建用户变量：
+
+变量名：UV_INDEX_URL
+变量值：https://pypi.tuna.tsinghua.edu.cn/simple
+echo &#x27;export UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple&#x27; &gt;&gt; ~/.bashrcsource ~/.bashrc  # 立即生效
+
+配置文件更换查找配置文件路径：
+windowsarchlinuxC:\Users\&lt;用户名&gt;\AppData\Roaming\uv\uv.toml~/.config/uv/uv.toml
+
+添加以下内容（文件不存在需手动创建）：
+[[index]]url = &quot;https://pypi.tuna.tsinghua.edu.cn/simple&quot;default = true
+
+项目内更换在项目根目录的 pyproject.toml 添加：
+[tool.uv]index-url = &quot;https://pypi.tuna.tsinghua.edu.cn/simple/&quot;
+
+验证换源效果
+uv add pandas  # 使用uv安装uv pip install numpy  # 使用uv加速的pip安装
+检查安装来源：
+uv pip show pandas
+
+优先级规则与注意事项优先级规则项目级配置 &gt; 全局环境变量 &gt; uv默认源
+注意事项
+避免混用uv add和uv pip install，可能导致依赖冲突1
+uv换源仅影响uv管理的包，系统级pip需单独配置3
+混合使用不同源可能导致依赖解析错误
+
+使用uv tool安装库可以使用uv tool直接安装pypi的库，--python=可以指定使用的python版本
+uv tool install ksaa --python=3.10
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
 </search>
