@@ -1281,9 +1281,20 @@ uv pip show pandas
 uv换源仅影响uv管理的包，系统级pip需单独配置3
 混合使用不同源可能导致依赖解析错误
 
+使用uv安装pythonuv python list        #查看可用的python版本uv python install 311       # 下载python 3.11
+
+使用uv添加requirements.txt依赖uv add -r requirements.txt --no-sync       #--no-sync只会写入pyproject.toml而不会安装uv add -r requirements.txt --dev        # 进 dev 依赖组uv add -r requirements.txt --group test # 进指定组uv pip install -r requirements.txt        #不会写入pyproject.tomluv export --format requirements-txt -o requirements.txt     #导出环境到requirements.txt
+
 使用uv tool安装库可以使用uv tool直接安装pypi的库，--python=可以指定使用的python版本
-uv tool install ksaa --python=3.10
-]]></content>
+uv tool install ruffuv tool install tyuv tool install ksaa --python=3.10          #可以指定python版本
+
+使用uv指定索引来源项目级uv add torch torchvision torchaudio --index https://download.pytorch.org/whl/cu129
+注意用 –index(追加额外索引),别用 -i&#x2F;–index-url——那是”替换默认索引”的老参数,会让其他依赖找不到
+[[tool.uv.index]]name = &quot;pytorch-cu129&quot;url = &quot;https://download.pytorch.org/whl/cu129&quot;explicit = true[tool.uv.sources]torch     = &#123; index = &quot;pytorch-cu129&quot; &#125;torchvision = &#123; index = &quot;pytorch-cu129&quot; &#125;torchaudio  = &#123; index = &quot;pytorch-cu129&quot; &#125;
+在项目根目录的pyproject.toml添加如上，则可以在安装torch``torchvision``torchaudio时使用自定义的地址
+
+
+全局index = [&#123; url = &quot;https://download.pytorch.org/whl/cu129&quot; &#125;]]]></content>
       <tags>
         <tag>linux</tag>
       </tags>
