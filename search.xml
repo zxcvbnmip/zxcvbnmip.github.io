@@ -714,6 +714,30 @@ rclone ls exhentai://erohon | sls &#x27;studio&#x27;384112914 (鍚屼汉瑾? [ST
       </tags>
   </entry>
   <entry>
+    <title>windows注册服务</title>
+    <url>/2026/10/05/windows%E6%B3%A8%E5%86%8C%E6%9C%8D%E5%8A%A1/</url>
+    <content><![CDATA[nssm首先安装nssm,然后时候nssm安装服务
+scoop install extras/nssmnssm install
+
+winsw安装winsw,然后使用winsw安装服务。编辑以你需要的服务名及xml后缀的xml文件，将winsw主程序复制到同目录并修改文件名问服务名称，随后执行命令
+scoop install main/winsw./servicename.exe install
+其实也可以不修改可执行程序名字，但是install后需要加上服务名
+winsw install servicename
+
+mihomo.xml&lt;service&gt;  &lt;id&gt;mihomo&lt;/id&gt;  &lt;name&gt;Mihomo Service&lt;/name&gt;  &lt;description&gt;Mihomo (Clash Meta) Windows Service&lt;/description&gt;  &lt;executable&gt;E:\scoop\apps\mihomo\current\mihomo.exe&lt;/executable&gt;  &lt;arguments&gt;-d C:\Users\Tokisaka\.config\mihomo&lt;/arguments&gt;    &lt;workingdirectory&gt;E:\scoop\apps\mihomo\current&lt;/workingdirectory&gt;  &lt;log mode=&quot;reset&quot;&gt;    &lt;logpath&gt;E:\cache\logs\mihomo&lt;/logpath&gt;    &lt;name&gt;mihomo_log&lt;/name&gt;  &lt;/log&gt;    &lt;onfailure action=&quot;restart&quot; delay=&quot;10sec&quot;/&gt;&lt;/service&gt;
+
+以上为mihomo.xml用例
+shawl同样先安装shawl
+scoop install main/shawlshawl add --name Mihomo --log-dir &quot;E:\cache\logs\mihomo&quot; -- --stderr &quot;E:\cache\logs\mihomo\mihomo_err.log&quot; -- &quot;E:\scoop\apps\mihomo\current\mihomo.exe&quot; -d &quot;C:\Users\Tokisaka\.config\mihomo&quot;
+
+servy这个要比上面都全面，但是我还没用过
+]]></content>
+      <tags>
+        <tag>win</tag>
+        <tag>软件</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>xiaomi mix2s救砖记录</title>
     <url>/2026/03/01/xiaomi-mix2s%E6%95%91%E7%A0%96%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[事前准备
